@@ -1,0 +1,15 @@
+{
+  "name": "escaner-ar",
+  "version": "1.0.0",
+  "description": "Proyecto de Realidad Aumentada para el Mundial 2026",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}

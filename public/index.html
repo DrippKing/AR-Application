@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Escaner AR - Mundial 2026</title>
+    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+    <script src="https://unpkg.com/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+    <link rel="stylesheet" href="./css/styles.css" />
+    <style>
+        body { margin: 0; overflow: hidden; background-color:#181A18;}
+        /* #ui-layer { position: absolute; top: 10px; left: 10px; z-index: 10; color: white; font-family: sans-serif; background: rgba(0,0,0,0.5); padding: 10px; } */
+    </style>
+</head>
+<body>
+
+<div id="tittle-banner">
+    <div id="logo">
+        <img src="./assets/trionda_ball.png" alt="Logo Mundial 2026" width="50" height="50">
+        <div class="banner-text">
+            <h1>WorldScan</h1>
+            <h3>2026</h3>
+        </div>
+    </div>
+</div>
+
+
+
+    <!-- <div id="ui-layer">
+        <h3>Escaner de Banderas</h3>
+        <p id="status-text">Apunta a una bandera...</p>
+    </div> -->
+
+    <a-scene id="ar-scene" color-space="sRGB" renderer="colorManagement: true, physicallyCorrectLights" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
+        
+        <!-- Agregamos cursor para detectar toques (clicks) en objetos con clase 'clickable' -->
+        <a-camera position="0 0 0" look-controls="enabled: false" cursor="fuse: false; rayOrigin: mouse;" raycaster="far: 10000; objects: .clickable"></a-camera>
+    </a-scene>
+    <script src="./js/script.js"></script>
+
+</body>
+</html>
