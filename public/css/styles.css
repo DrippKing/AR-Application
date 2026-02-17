@@ -499,3 +499,263 @@ body{
     grid-template-columns:repeat(auto-fit, minmax(120px, 1fr));
   }
 }
+/* ======================================================
+   TRIVIA (MODAL) — UI FUNCIONAL + RESPONSIVE
+   - Progreso (texto + barra)
+   - Score
+   - Opciones (botones)
+   - Feedback correcto/incorrecto
+   - Estado "escanea una bandera"
+   ====================================================== */
+
+.trivia-head{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  margin-bottom:14px;
+}
+
+.trivia-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  width:max-content;
+  padding:6px 10px;
+  border-radius:999px;
+  background:rgba(255,255,255,0.08);
+  border:1px solid rgba(255,255,255,0.14);
+  font-size:12px;
+  opacity:.95;
+}
+
+.trivia-title{
+  margin:0;
+  font-size:20px;
+  line-height:1.2;
+}
+
+.trivia-sub{
+  margin:0;
+  opacity:.8;
+  font-size:13px;
+  line-height:1.35;
+}
+
+.trivia-meta{
+  display:flex;
+  gap:14px;
+  align-items:center;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  padding:10px 12px;
+  border-radius:16px;
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.12);
+}
+
+.trivia-progress{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  min-width:220px;
+  flex:1 1 220px;
+}
+
+#trivia-progress-text{
+  font-size:12px;
+  opacity:.9;
+}
+
+.trivia-bar{
+  width:100%;
+  height:10px;
+  border-radius:999px;
+  background:rgba(255,255,255,0.10);
+  border:1px solid rgba(255,255,255,0.12);
+  overflow:hidden;
+}
+
+.trivia-bar-fill{
+  height:100%;
+  width:0%;
+  border-radius:999px;
+  background:linear-gradient(90deg,#08b059,#00b1e8,#203771);
+  transition:width .2s ease;
+}
+
+.trivia-score{
+  display:flex;
+  align-items:baseline;
+  gap:10px;
+  padding:8px 12px;
+  border-radius:14px;
+  background:rgba(0,0,0,0.25);
+  border:1px solid rgba(255,255,255,0.12);
+}
+
+.trivia-score-label{
+  font-size:12px;
+  opacity:.8;
+}
+
+.trivia-score-value{
+  font-size:20px;
+  font-weight:700;
+  letter-spacing:.5px;
+}
+
+/* Body */
+.trivia-body{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+
+/* Estado: sin bandera */
+.trivia-empty{
+  padding:14px;
+  border-radius:16px;
+  background:rgba(255,255,255,0.06);
+  border:1px dashed rgba(255,255,255,0.25);
+}
+
+.trivia-empty p{
+  margin:0 0 6px 0;
+  line-height:1.35;
+}
+
+.trivia-qwrap{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+.trivia-question{
+  font-size:16px;
+  line-height:1.35;
+  padding:14px;
+  border-radius:16px;
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.12);
+}
+
+/* Opciones */
+.trivia-answers{
+  display:grid;
+  grid-template-columns:repeat(2, minmax(0, 1fr));
+  gap:10px;
+}
+
+.trivia-answer{
+  width:100%;
+  padding:12px 12px;
+  border-radius:14px;
+  border:1px solid rgba(255,255,255,0.15);
+  background:rgba(255,255,255,0.08);
+  color:white;
+  cursor:pointer;
+  transition:.15s ease;
+  min-height:48px;
+  text-align:left;
+  line-height:1.2;
+}
+
+.trivia-answer:hover{
+  background:rgba(255,255,255,0.16);
+}
+
+.trivia-answer:active{
+  transform:scale(.98);
+}
+
+/* Estados de respuesta */
+.trivia-answer.correct{
+  border-color: rgba(8,176,89,0.9);
+  background: rgba(8,176,89,0.20);
+}
+
+.trivia-answer.wrong{
+  border-color: rgba(255,0,0,0.55);
+  background: rgba(255,0,0,0.12);
+}
+
+.trivia-answer:disabled{
+  opacity:.7;
+  cursor:not-allowed;
+}
+
+/* Feedback */
+.trivia-feedback{
+  min-height:22px;
+  font-size:13px;
+  opacity:.9;
+}
+
+.trivia-feedback.ok{
+  color:#7ff2b7;
+}
+
+.trivia-feedback.bad{
+  color:#ff9b9b;
+}
+
+/* Acciones */
+.trivia-actions{
+  display:flex;
+  gap:10px;
+  align-items:center;
+  justify-content:flex-end;
+  flex-wrap:wrap;
+}
+
+#trivia-next[disabled]{
+  opacity:.6;
+  cursor:not-allowed;
+}
+
+/* Resultado final */
+.trivia-result{
+  padding:14px;
+  border-radius:16px;
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.12);
+}
+
+.trivia-result-title{
+  margin:0 0 6px 0;
+}
+
+.trivia-result-text{
+  margin:0 0 12px 0;
+  opacity:.9;
+}
+
+/* ======================================================
+   TRIVIA — RESPONSIVE
+   ====================================================== */
+
+@media (max-width: 720px){
+  .trivia-answers{
+    grid-template-columns:1fr;
+  }
+  .trivia-question{
+    font-size:15px;
+  }
+}
+
+@media (max-width: 560px){
+  .trivia-title{
+    font-size:18px;
+  }
+  .trivia-meta{
+    gap:10px;
+  }
+  .trivia-progress{
+    min-width:unset;
+    flex:1 1 100%;
+  }
+  .trivia-score{
+    width:100%;
+    justify-content:space-between;
+  }
+}

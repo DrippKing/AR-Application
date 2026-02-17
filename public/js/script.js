@@ -129,8 +129,19 @@ if (hud) {
     if (!modalId) return;
 
     openModalById(modalId);
+
+    // ✅ HOOK: iniciar trivia cuando se abre el modal
+    if (modalId === "modal-trivia") {
+      const countryId = currentCountry ? currentCountry.id : null;
+
+      // Si trivia.js todavía no cargó, no truenes
+      if (window.Trivia && typeof window.Trivia.start === "function") {
+        window.Trivia.start(countryId);
+      }
+    }
   });
 }
+
 
 
 // --- Cerrar modales (X / botón Cerrar) ---
@@ -362,12 +373,18 @@ countries.forEach((country, index) => {
   });
 
   entity.addEventListener("targetLost", () => {
-    currentCountry = null;
+  currentCountry = null;
 
-    hideHUD();
-    closeAllModals();
-    setStatus("Apunta a una bandera...");
-  });
+  hideHUD();
+  closeAllModals();
+  setStatus("Apunta a una bandera...");
+
+  // ✅ opcional: limpiar estado de trivia
+  if (window.Trivia && typeof window.Trivia.reset === "function") {
+    window.Trivia.reset();
+  }
+});
+
 
   // Mantengo tu click a Google
   plane.addEventListener("click", () => {
