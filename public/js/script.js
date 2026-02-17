@@ -29,6 +29,27 @@ if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
   };
 }
 
+// =====================================================
+// FIX 100vh en móviles (evita saltos por barra del navegador)
+// - Crea/actualiza la variable CSS --vh
+// =====================================================
+function setVhVar() {
+  const vh = window.innerHeight * 0.01;
+  document.documentElement.style.setProperty("--vh", `${vh}px`);
+}
+
+// Set inicial
+setVhVar();
+
+// Recalcular cuando cambie el tamaño (rotación / UI del navegador)
+window.addEventListener("resize", setVhVar);
+
+// iOS a veces dispara "orientationchange" aparte
+window.addEventListener("orientationchange", () => {
+  // pequeño delay para que el alto final se estabilice
+  setTimeout(setVhVar, 150);
+});
+
 
 // --- DATOS DE PAÍSES ---
 const countries = [
@@ -80,9 +101,18 @@ function closeAllModals() {
 
 function openModalById(id) {
   closeAllModals();
+
   const modal = document.getElementById(id);
-  if (modal) modal.classList.remove("hidden");
+  if (!modal) return;
+
+  modal.classList.remove("hidden");
+
+  // ✅ reset de scroll (card y modal)
+  const card = modal.querySelector(".modal-card");
+  if (card) card.scrollTop = 0;
+  modal.scrollTop = 0;
 }
+
 
 // Estado inicial seguro
 hideHUD();

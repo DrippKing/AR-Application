@@ -1,6 +1,22 @@
 /* ======================================================
-   WORLD SCAN 2026 — STYLES COMPLETOS
+   WORLD SCAN 2026 — STYLES COMPLETOS (RESPONSIVE PRO)
+   - HUD adaptable (wrap + scroll) + safe-area
+   - Modales scrolleables sin cortar contenido
+   - Editor: 2 cols -> 1 col (tablet/móvil)
+   - Filtros: grid fluido auto-fit (no se rompe)
    ====================================================== */
+
+/* ===============================
+   BASE
+   =============================== */
+
+:root{
+  --safe-b: env(safe-area-inset-bottom, 0px);
+  --safe-t: env(safe-area-inset-top, 0px);
+  --vh: 1vh; /* (opcional) si luego lo setéas con JS para móvil */
+}
+
+*{ box-sizing:border-box; }
 
 body{
   margin:0;
@@ -14,85 +30,96 @@ body{
    BANNER SUPERIOR (TU DISEÑO ORIGINAL MEJORADO)
    ====================================================== */
 
-#tittle-banner {
-    position: absolute;
-    top: 10px;
-    z-index: 10;
-    width: 100%;
-    height: 120px;
-    background-image: linear-gradient(to right, #08b059, #00b1e8, #203771);
-    display: flex;
-    justify-content: center;
-    padding: 10px;
-    box-sizing: border-box;
-    border-radius: 18px;
+#tittle-banner{
+  position:absolute;
+  top: calc(10px + var(--safe-t));
+  z-index:10;
+  width: min(100%, 1200px);
+  left:50%;
+  transform:translateX(-50%);
+  height:120px;
+  background-image: linear-gradient(to right, #08b059, #00b1e8, #203771);
+  display:flex;
+  justify-content:center;
+  padding:10px;
+  border-radius:18px;
+  border:1px solid rgba(255,255,255,0.15);
+  box-shadow:0 12px 30px rgba(0,0,0,0.25);
 }
 
 #logo{
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 10px;
-    color: white;
+  display:flex;
+  flex-direction:row;
+  align-items:center;
+  gap:10px;
+  color:white;
 }
 
-.banner-text {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
+.banner-text{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
 }
 
-.banner-text h1 {
-    margin: 0;
-    font-size: 28px;
+.banner-text h1{
+  margin:0;
+  font-size:28px;
+  line-height:1.1;
 }
 
-.banner-text h3 {
-    margin: 0;
-    font-style: italic;
-    display: flex;
-    align-items: center;
-    width: 100%;
-    white-space: nowrap;
+.banner-text h3{
+  margin:0;
+  font-style:italic;
+  display:flex;
+  align-items:center;
+  width:100%;
+  white-space:nowrap;
+  line-height:1.1;
 }
 
-.banner-text h3::before {
-    content: "";
-    width: 15px;
-    height: 2px;
-    background-color: white;
-    margin-right: 5px;
+.banner-text h3::before{
+  content:"";
+  width:15px;
+  height:2px;
+  background-color:white;
+  margin-right:5px;
 }
 
-.banner-text h3::after {
-    content: "";
-    flex-grow: 1;
-    height: 2px;
-    background-color: white;
-    margin-left: 5px;
+.banner-text h3::after{
+  content:"";
+  flex-grow:1;
+  height:2px;
+  background-color:white;
+  margin-left:5px;
 }
 
 /* ======================================================
    UTILIDADES
    ====================================================== */
 
-.hidden { display:none !important; }
+.hidden{ display:none !important; }
 
 /* ======================================================
-   HUD INFERIOR
+   HUD INFERIOR (RESPONSIVE + TÁCTIL)
    ====================================================== */
 
 .hud{
   position:absolute;
   left:50%;
   transform:translateX(-50%);
-  bottom:18px;
+  bottom: calc(18px + var(--safe-b));
   z-index:50;
 
   display:flex;
+  align-items:center;
   gap:12px;
-  padding:12px 14px;
 
+  /* claves responsive */
+  flex-wrap:wrap;
+  max-width:min(96vw, 980px);
+  justify-content:center;
+
+  padding:12px 14px;
   border-radius:20px;
   background:rgba(0,0,0,0.55);
   backdrop-filter:blur(12px);
@@ -109,6 +136,13 @@ body{
   color:white;
   cursor:pointer;
   transition:.15s ease;
+
+  /* accesibilidad/táctil */
+  min-height:44px;
+  min-width:44px;
+
+  /* evita que el texto reviente */
+  white-space:nowrap;
 }
 
 .hud-btn:hover{
@@ -120,7 +154,7 @@ body{
 }
 
 /* ======================================================
-   MODAL GENERAL
+   MODAL GENERAL (SCROLLEABLE EN MÓVIL)
    ====================================================== */
 
 .modal{
@@ -129,9 +163,14 @@ body{
   display:flex;
   align-items:center;
   justify-content:center;
+  padding: max(14px, var(--safe-t)) 12px calc(max(14px, var(--safe-b))) 12px;
+
   background:rgba(0,0,0,0.6);
   backdrop-filter:blur(8px);
   z-index:100;
+
+  /* si el contenido es muy alto */
+  overflow:auto;
 }
 
 .modal-card{
@@ -142,12 +181,16 @@ body{
   border:1px solid rgba(255,255,255,0.15);
   box-shadow:0 25px 70px rgba(0,0,0,0.5);
   position:relative;
+
+  /* evita que se salga de pantalla */
+  max-height: calc(100 * var(--vh) - 28px);
+  overflow:auto;
 }
 
 .modal-close{
-  position:absolute;
-  top:12px;
-  right:12px;
+  position:sticky; /* se queda accesible al scrollear */
+  top:0;
+  margin-left:auto;
   width:36px;
   height:36px;
   border-radius:12px;
@@ -172,6 +215,7 @@ body{
   display:grid;
   grid-template-columns:2fr 1fr;
   gap:20px;
+  align-items:start;
 }
 
 /* ======================================================
@@ -191,6 +235,7 @@ body{
   display:flex;
   gap:6px;
   background:rgba(255,255,255,0.08);
+  align-items:center;
 }
 
 .player-dot{
@@ -207,9 +252,11 @@ body{
   opacity:.7;
 }
 
+/* video */
 .video-preview{
   width:100%;
   display:block;
+  height:auto;
 }
 
 /* Marcador overlay */
@@ -222,11 +269,12 @@ body{
   overflow:hidden;
   font-size:12px;
   font-weight:bold;
+  z-index:3;
 }
 
-.sb-left{background:#08b059;padding:6px 10px;}
-.sb-mid{background:#111;padding:6px 8px;}
-.sb-right{background:#203771;padding:6px 10px;}
+.sb-left{ background:#08b059; padding:6px 10px; }
+.sb-mid{ background:#111;   padding:6px 8px;  }
+.sb-right{background:#203771; padding:6px 10px;}
 
 /* ======================================================
    ACERVO
@@ -236,6 +284,7 @@ body{
   display:flex;
   flex-direction:column;
   gap:12px;
+  min-width:0;
 }
 
 .side-title{
@@ -259,6 +308,7 @@ body{
   border:1px solid rgba(255,255,255,0.15);
   cursor:pointer;
   transition:.15s ease;
+  align-items:center;
 }
 
 .video-item.active{
@@ -278,13 +328,22 @@ body{
   display:flex;
   align-items:center;
   justify-content:center;
+  flex:0 0 auto;
 }
 
-.meta-title{font-size:13px;}
-.meta-sub{font-size:11px;opacity:.7;}
+.meta-title{
+  font-size:13px;
+  line-height:1.2;
+}
+
+.meta-sub{
+  font-size:11px;
+  opacity:.7;
+  line-height:1.2;
+}
 
 /* ======================================================
-   FILTROS
+   FILTROS (RESPONSIVE REAL)
    ====================================================== */
 
 .filters{
@@ -300,9 +359,10 @@ body{
   font-weight:bold;
 }
 
+/* AUTO-FIT = se acomoda solo según ancho */
 .filters-grid{
   display:grid;
-  grid-template-columns:repeat(5,1fr);
+  grid-template-columns:repeat(auto-fit, minmax(140px, 1fr));
   gap:10px;
 }
 
@@ -315,6 +375,14 @@ body{
   cursor:pointer;
   transition:.15s ease;
   font-size:12px;
+
+  /* táctil + texto controlado */
+  min-height:44px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  line-height:1.1;
 }
 
 .filter-chip:hover{
@@ -336,6 +404,7 @@ body{
   inset:0;
   pointer-events:none;
   border-radius:18px;
+  z-index:2;
 }
 
 /* ======================================================
@@ -346,15 +415,18 @@ body{
   display:flex;
   justify-content:space-between;
   align-items:center;
+  gap:12px;
+  flex-wrap:wrap;
 }
 
 .primary-btn{
-  padding:8px 14px;
+  padding:10px 14px;
   border-radius:12px;
   border:none;
   background:linear-gradient(90deg,#08b059,#00b1e8);
   color:white;
   cursor:pointer;
+  min-height:44px;
 }
 
 .primary-btn:hover{
@@ -362,14 +434,68 @@ body{
 }
 
 /* ======================================================
-   RESPONSIVE
+   RESPONSIVE (AJUSTES FINOS)
    ====================================================== */
 
-@media(max-width:900px){
+@media (max-width: 900px){
+  #tittle-banner{
+    height:auto;
+    padding:10px 12px;
+  }
+  .banner-text h1{
+    font-size:22px;
+  }
+
   .editor-grid{
     grid-template-columns:1fr;
+    gap:14px;
   }
+
+  .thumb{
+    width:64px;
+    height:46px;
+  }
+}
+
+/* móviles */
+@media (max-width: 560px){
+  body{ overflow:hidden; }
+
+  #tittle-banner{
+    top: calc(8px + var(--safe-t));
+    width: calc(100% - 16px);
+    border-radius:16px;
+  }
+
+  .banner-text h1{ font-size:20px; }
+  .banner-text h3{ font-size:12px; }
+
+  .hud{
+    bottom: calc(12px + var(--safe-b));
+    padding:10px 10px;
+    gap:10px;
+    border-radius:18px;
+
+    /* si no cabe, permite scroll horizontal como fallback */
+    max-width:96vw;
+  }
+
+  .hud-btn{
+    padding:10px 12px;
+    border-radius:14px;
+  }
+
+  .modal-card{
+    width: 96vw;
+    padding:16px;
+    border-radius:18px;
+  }
+
+  .filters{
+    padding:14px;
+  }
+
   .filters-grid{
-    grid-template-columns:repeat(2,1fr);
+    grid-template-columns:repeat(auto-fit, minmax(120px, 1fr));
   }
 }

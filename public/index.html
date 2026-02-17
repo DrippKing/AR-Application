@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Escaner AR - Mundial 2026</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Escáner AR — Mundial 2026</title>
 
   <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
   <script src="https://unpkg.com/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
@@ -19,7 +20,7 @@
   <!-- Banner superior -->
   <div id="tittle-banner">
     <div id="logo">
-      <img src="./assets/trionda_ball.png" alt="Logo Mundial 2026" width="50" height="50">
+      <img src="./assets/trionda_ball.png" alt="Logo Mundial 2026" width="50" height="50" />
       <div class="banner-text">
         <h1>WorldScan</h1>
         <h3>2026</h3>
@@ -66,7 +67,7 @@
             <span class="player-label">WORLD CUP 2026 • PREVIEW</span>
           </div>
 
-          <!-- ✅ VIDEO REAL: coloca videoCuatro.mp4 en /public -->
+          <!-- ✅ VIDEO REAL -->
           <video
             id="video-preview"
             class="video-preview"
@@ -82,6 +83,9 @@
             <div class="sb-mid">LIVE</div>
             <div class="sb-right">2026</div>
           </div>
+
+          <!-- Overlay FX (pixel/thermal/custom) -->
+          <div id="fx-overlay" class="fx-overlay" aria-hidden="true"></div>
         </div>
 
         <!-- Sidebar: Acervo -->
@@ -137,27 +141,27 @@
         <div class="filters-title">Filtros permitidos (FE)</div>
 
         <div class="filters-grid">
-          <button class="filter-chip" type="button" data-filter="blur">
+          <button class="filter-chip" type="button" data-filter="blur" aria-pressed="false">
             <span class="chip-ic">🔵</span>
             <span class="chip-txt">Desenfoque</span>
           </button>
 
-          <button class="filter-chip" type="button" data-filter="pixel">
+          <button class="filter-chip" type="button" data-filter="pixel" aria-pressed="false">
             <span class="chip-ic">🟣</span>
             <span class="chip-txt">Pixelado</span>
           </button>
 
-          <button class="filter-chip" type="button" data-filter="thermal">
+          <button class="filter-chip" type="button" data-filter="thermal" aria-pressed="false">
             <span class="chip-ic">🔴</span>
             <span class="chip-txt">Cámara térmica</span>
           </button>
 
-          <button class="filter-chip" type="button" data-filter="color">
+          <button class="filter-chip" type="button" data-filter="color" aria-pressed="false">
             <span class="chip-ic">🟢</span>
             <span class="chip-txt">Ajuste de color</span>
           </button>
 
-          <button class="filter-chip" type="button" data-filter="custom">
+          <button class="filter-chip" type="button" data-filter="custom" aria-pressed="false">
             <span class="chip-ic">⭐</span>
             <span class="chip-txt">Filtro custom</span>
           </button>
@@ -178,7 +182,7 @@
     </div>
   </div>
 
-  <!-- Otros modales (se quedan simples por ahora) -->
+  <!-- Otros modales -->
   <div id="modal-stats" class="modal hidden" aria-hidden="true">
     <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="stats-title">
       <button class="modal-close" type="button" data-close aria-label="Cerrar">✕</button>
@@ -209,6 +213,7 @@
   <!-- AR Scene -->
   <a-scene
     id="ar-scene"
+    mindar-image="imageTargetSrc: ./assets/targets.mind; autoStart: true; uiScanning: yes; uiLoading: yes;"
     color-space="sRGB"
     renderer="colorManagement: true, physicallyCorrectLights"
     vr-mode-ui="enabled: false"
