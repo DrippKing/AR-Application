@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Escaner AR - Mundial 2026</title>
+
+  <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+  <script src="https://unpkg.com/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+
+  <link rel="stylesheet" href="./css/filtros.css" />
+
+  <style>
+    body { margin: 0; overflow: hidden; background-color:#181A18; }
+  </style>
+</head>
+
+<body>
+
+  <!-- Banner superior -->
+  <div id="tittle-banner">
+    <div id="logo">
+      <img src="./assets/trionda_ball.png" alt="Logo Mundial 2026" width="50" height="50">
+      <div class="banner-text">
+        <h1>WorldScan</h1>
+        <h3>2026</h3>
+      </div>
+    </div>
+  </div>
+
+  <!-- HUD inferior -->
+  <div id="hud" class="hud hidden" aria-label="Menú AR">
+    <button class="hud-btn" type="button" data-modal="modal-video">🎥 Video oficial</button>
+    <button class="hud-btn" type="button" data-modal="modal-stats">📊 Estadísticas</button>
+    <button class="hud-btn" type="button" data-modal="modal-estadio">🏟 Información del Estadio</button>
+    <button class="hud-btn" type="button" data-modal="modal-trivia">🎮 Curiosidades</button>
+  </div>
+
+  <!-- =========================
+       MODAL: VIDEO + FILTROS
+       (REQUISITO FE - VISUAL)
+       ========================= -->
+  <div id="modal-video" class="modal hidden" aria-hidden="true">
+    <div class="modal-card video-editor" role="dialog" aria-modal="true" aria-labelledby="video-title">
+      <button class="modal-close" type="button" data-close aria-label="Cerrar">✕</button>
+
+      <div class="video-head">
+        <div class="video-badge">🎥 Video + Filtros</div>
+        <h2 id="video-title" class="video-title">Video oficial — País detectado</h2>
+        <p class="video-sub">Editor visual (filtros FE): selecciona un filtro para previsualizar (aún sin procesamiento real).</p>
+      </div>
+
+      <!-- Contenedor tipo reproductor -->
+      <div class="player-shell" aria-label="Reproductor de video (maqueta)">
+        <div class="player-top">
+          <span class="player-dot"></span>
+          <span class="player-dot"></span>
+          <span class="player-dot"></span>
+          <span class="player-label">PREVIEW</span>
+        </div>
+
+        <!-- Video dummy (puedes reemplazar src después) -->
+        <video
+          id="video-preview"
+          class="video-preview"
+          preload="metadata"
+          playsinline
+          muted
+          controls
+          src="./assets/demo.mp4"
+        ></video>
+
+        <!-- Overlay estético "scoreboard" -->
+        <div class="scoreboard">
+          <div class="sb-left">MEX</div>
+          <div class="sb-mid">VS</div>
+          <div class="sb-right">RIV</div>
+        </div>
+      </div>
+
+      <!-- Controles de filtros -->
+      <div class="filters">
+        <div class="filters-title">Filtros (permitidos por FE)</div>
+
+        <div class="filters-grid">
+          <button class="filter-chip" type="button" data-filter="blur">
+            <span class="chip-ic">🔵</span>
+            <span class="chip-txt">Desenfoque</span>
+          </button>
+
+          <button class="filter-chip" type="button" data-filter="pixel">
+            <span class="chip-ic">🟣</span>
+            <span class="chip-txt">Pixelado</span>
+          </button>
+
+          <button class="filter-chip" type="button" data-filter="thermal">
+            <span class="chip-ic">🔴</span>
+            <span class="chip-txt">Cámara térmica</span>
+          </button>
+
+          <button class="filter-chip" type="button" data-filter="color">
+            <span class="chip-ic">🟢</span>
+            <span class="chip-txt">Ajuste de color</span>
+          </button>
+
+          <button class="filter-chip" type="button" data-filter="custom">
+            <span class="chip-ic">⭐</span>
+            <span class="chip-txt">Filtro custom</span>
+          </button>
+        </div>
+
+        <!-- Nota FE -->
+        <div class="fe-note">
+          ✅ Nota: Se evitan filtros prohibidos (B/N, sepia, invertido). Aquí solo se muestra UI y selección.
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="video-footer">
+        <small>Avance visual: editor listo. Falta conectar procesamiento real de filtros.</small>
+        <button class="primary-btn" type="button" data-close>Listo</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Otros modales (maqueta simple por ahora) -->
+  <div id="modal-stats" class="modal hidden" aria-hidden="true">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="stats-title">
+      <button class="modal-close" type="button" data-close aria-label="Cerrar">✕</button>
+      <h2 id="stats-title">📊 Estadísticas</h2>
+      <p>Avance visual: tarjetas con datos (grupo, ranking, partidos, goles) y barra de posesión.</p>
+      <div class="modal-note">*Por ahora es maqueta visual.*</div>
+    </div>
+  </div>
+
+  <div id="modal-estadio" class="modal hidden" aria-hidden="true">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="estadio-title">
+      <button class="modal-close" type="button" data-close aria-label="Cerrar">✕</button>
+      <h2 id="estadio-title">🏟 Información del Estadio</h2>
+      <p>Avance visual: aquí se mostrará sede, ciudad, capacidad y detalles del partido.</p>
+      <div class="modal-note">*Por ahora es maqueta visual.*</div>
+    </div>
+  </div>
+
+  <div id="modal-trivia" class="modal hidden" aria-hidden="true">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="trivia-title">
+      <button class="modal-close" type="button" data-close aria-label="Cerrar">✕</button>
+      <h2 id="trivia-title">🎮 Curiosidades</h2>
+      <p>Avance visual: preguntas / curiosidades del país detectado (con botones).</p>
+      <div class="modal-note">*Por ahora es maqueta visual.*</div>
+    </div>
+  </div>
+
+  <!-- AR Scene -->
+  <a-scene
+    id="ar-scene"
+    color-space="sRGB"
+    renderer="colorManagement: true, physicallyCorrectLights"
+    vr-mode-ui="enabled: false"
+    device-orientation-permission-ui="enabled: false"
+  >
+    <a-camera
+      position="0 0 0"
+      look-controls="enabled: false"
+      cursor="fuse: false; rayOrigin: mouse;"
+      raycaster="far: 10000; objects: .clickable"
+    ></a-camera>
+  </a-scene>
+
+  <script src="./js/filtros.js"></script>
+</body>
+</html>
