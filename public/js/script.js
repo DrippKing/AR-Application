@@ -53,16 +53,16 @@ window.addEventListener("orientationchange", () => {
 
 // --- DATOS DE PAÍSES ---
 const countries = [
-  { id: "colombia", name: "Colombia", color: "yellow" },
-  { id: "coreadelsur", name: "Corea del Sur", color: "white" },
-  { id: "espana", name: "España", color: "red" },
-  { id: "japon", name: "Japón", color: "white" },
-  { id: "mexico", name: "México", color: "green" },
-  { id: "paisesbajos", name: "Países Bajos", color: "orange" },
-  { id: "sudafrica", name: "Sudáfrica", color: "yellow" },
-  { id: "tunez", name: "Túnez", color: "red" },
-  { id: "uruguay", name: "Uruguay", color: "blue" },
-  { id: "uzbekistan", name: "Uzbekistán", color: "blue" },
+  { id: "colombia", name: "Colombia", color: "yellow", code: "COL" },
+  { id: "coreadelsur", name: "Corea del Sur", color: "white", code: "KOR" },
+  { id: "espana", name: "España", color: "red", code: "ESP" },
+  { id: "japon", name: "Japón", color: "white", code: "JPN" },
+  { id: "mexico", name: "México", color: "green", code: "MEX" },
+  { id: "paisesbajos", name: "Países Bajos", color: "orange", code: "NED" },
+  { id: "sudafrica", name: "Sudáfrica", color: "yellow", code: "RSA" },
+  { id: "tunez", name: "Túnez", color: "red", code: "TUN" },
+  { id: "uruguay", name: "Uruguay", color: "blue", code: "URU" },
+  { id: "uzbekistan", name: "Uzbekistán", color: "blue", code: "UZB" },
 ];
 
 const scene = document.getElementById("ar-scene");
@@ -362,14 +362,17 @@ countries.forEach((country, index) => {
 
     updateVideoUIForCountry(country);
 
-    fetch(`/api/info-pais/${country.id}`)
-      .then((res) => res.json())
-      .then((data) => {
-        setStatus(`${country.name.toUpperCase()}: ${data.estadio}`);
-      })
-      .catch(() => {
-        setStatus(`${country.name.toUpperCase()} detectado ✅`);
+    // Conectar con la Base de Datos
+    if (window.cargarDatosDesdeBD && country.code) {
+      window.cargarDatosDesdeBD(country.code).then((datos) => {
+        if (datos) {
+          const estadioNombre = datos.estadio_nombre || 'Info no encontrada';
+          setStatus(`${country.name.toUpperCase()}: ${estadioNombre} (BD)`);
+        } else {
+          setStatus(`Error al cargar datos de ${country.name}`);
+        }
       });
+    }
   });
 
   entity.addEventListener("targetLost", () => {

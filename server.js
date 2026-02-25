@@ -1,34 +1,78 @@
 const express = require('express');
+const mysql = require('mysql2');
 const path = require('path');
 const app = express();
-const PORT = 3000;
+const port = 3000;
 
-// Servir archivos estáticos (HTML, CSS, JS, Modelos 3D, .mind files)
+// 1. Configuración de la Base de Datos
+const db = mysql.createPool({
+    host: 'localhost',
+    user: 'root',      // CAMBIAR POR TU USUARIO
+    password: 'root',      // CAMBIAR POR TU CONTRASEÑA
+    database: 'mundial_ar',
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0
+});
+
+// Verificación inicial de conexión (opcional, pero útil para debug)
+db.getConnection((err, connection) => {
+    if (err) {
+        console.error('❌ Error conectando a MySQL:', err);
+    } else {
+        console.log('✅ Conectado a MySQL (Pool activo)');
+        connection.release(); // Liberamos la conexión para que el pool la use
+    }
+});
+
+// 2. Servir archivos estáticos (HTML, CSS, JS, Assets)
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Ruta principal
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+// 3. API Endpoints (Para que el Frontend consuma datos)
+
+// Obtener información general de un país por su código (ej: MEX)
+app.get('/api/pais/:codigo', (req, res) => {
+    const codigo = req.params.codigo;
+    const sql = `
+        SELECT p.*, e.nombre as estadio_nombre, e.ciudad as estadio_ciudad, e.capacidad 
+        FROM paises p 
+        LEFT JOIN estadios e ON p.id = e.pais_id 
+        WHERE p.codigo = ?`;
+
+    db.query(sql, [codigo], (err, results) => {
+        if (err) return res.status(500).json({ error: err.message });
+        if (results.length === 0) return res.status(404).json({ message: 'País no encontrado' });
+        res.json(results[0]);
+    });
 });
 
-// API opcional para datos en tiempo real
-app.get('/api/info-pais/:pais', (req, res) => {
-    const datos = {
-        'colombia': { grupo: 'C', estadio: 'Azteca (CDMX)', partidos: 'vs Uzbekistán' },
-        'coreadelsur': { grupo: 'A', estadio: 'CDMX, GDL y MTY', partidos: 'Fase de Grupos' },
-        'espana': { grupo: 'B', estadio: 'Akron (GDL)', partidos: 'vs Uruguay' },
-        'japon': { grupo: 'D', estadio: 'BBVA (MTY)', partidos: 'Fase de Grupos' },
-        'mexico': { grupo: 'A', estadio: 'Azteca (CDMX) y Akron (GDL)', partidos: '3 partidos (Fase de Grupos)' },
-        'paisesbajos': { grupo: 'E', estadio: 'BBVA (MTY)', partidos: 'Fase de Grupos' },
-        'sudafrica': { grupo: 'A', estadio: 'Azteca (CDMX)', partidos: 'Inauguración vs México' },
-        'tunez': { grupo: 'F', estadio: 'BBVA (MTY)', partidos: 'Fase de Grupos' },
-        'uruguay': { grupo: 'B', estadio: 'Akron (GDL)', partidos: 'vs España' },
-        'uzbekistan': { grupo: 'C', estadio: 'Azteca (CDMX)', partidos: 'vs Colombia' }
-    };
-    res.json(datos[req.params.pais] || { error: 'País no encontrado' });
+// Obtener trivia de un país
+app.get('/api/trivia/:codigo', (req, res) => {
+    const codigo = req.params.codigo;
+    const sql = `
+        SELECT t.id, t.pregunta, t.opciones, t.respuesta_correcta 
+        FROM trivias t
+        JOIN paises p ON t.pais_id = p.id
+        WHERE p.codigo = ?`;
+
+    db.query(sql, [codigo], (err, results) => {
+        if (err) return res.status(500).json({ error: err.message });
+        
+        // Parsear las opciones que vienen como string JSON desde MySQL
+        const triviaLimpia = results.map(row => {
+            try {
+                return { ...row, opciones: JSON.parse(row.opciones) };
+            } catch (e) {
+                console.error(`⚠️ Error parseando JSON en trivia (ID: ${row.id}):`, row.opciones);
+                // Fallback: Si falla el JSON, intentamos separar por comas o devolver array vacío
+                const opcionesFallback = row.opciones && typeof row.opciones === 'string' ? row.opciones.split(',') : [];
+                return { ...row, opciones: opcionesFallback };
+            }
+        });
+        res.json(triviaLimpia);
+    });
 });
 
-app.listen(PORT, () => {
-    console.log(`Servidor AR corriendo en http://localhost:${PORT}`);
-    // NOTA: Para probar AR en el móvil, necesitas HTTPS o usar localhost con cable USB.
+app.listen(port, () => {
+    console.log(`🚀 Servidor corriendo en http://localhost:${port}`);
 });
