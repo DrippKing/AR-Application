@@ -8,6 +8,7 @@
 //    * Desenfoque: CSS filter (blur)
 //    * Ajuste de color: CSS filter (saturate + contrast + hue-rotate)  ✅ (no es "exposición")
 //    * Pixelado / Térmica / Custom: overlays visuales (NO filtros prohibidos)
+// - ✅ Pelota 3D GLB aparece en AR por target + tap para girar
 // =====================================================
 
 
@@ -141,7 +142,6 @@ if (hud) {
     }
   });
 }
-
 
 
 // --- Cerrar modales (X / botón Cerrar) ---
@@ -335,75 +335,88 @@ function updateVideoUIForCountry(country) {
 // =====================================================
 // MindAR: generación automática de targets
 // =====================================================
-countries.forEach((country, index) => {
-  const entity = document.createElement("a-entity");
-  entity.setAttribute("mindar-image-target", `targetIndex: ${index}`);
+// =====================================================
+// MindAR: generación automática de targets (cuando scene esté listo)
+// =====================================================
+if (!scene) {
+  console.warn("No se encontró #ar-scene");
+} else {
+  scene.addEventListener("loaded", () => {
+    console.log("✅ A-Frame scene loaded. Creando targets...");
 
-  // Plano clickable
-  const plane = document.createElement("a-plane");
-  plane.setAttribute("class", "clickable");
-  plane.setAttribute("color", country.color);
-  plane.setAttribute("opacity", "0.6");
-  plane.setAttribute("height", "0.55");
-  plane.setAttribute("width", "1");
+    countries.forEach((country, index) => {
+      const entity = document.createElement("a-entity");
+      entity.setAttribute("mindar-image-target", `targetIndex: ${index}`);
 
-  // Texto
-  const text = document.createElement("a-text");
-  text.setAttribute("value", country.name.toUpperCase());
-  text.setAttribute("align", "center");
-  text.setAttribute("position", "0 0 0.1");
+      const plane = document.createElement("a-plane");
+      plane.setAttribute("class", "clickable");
+      plane.setAttribute("color", country.color);
+      plane.setAttribute("opacity", "0.6");
+      plane.setAttribute("height", "0.55");
+      plane.setAttribute("width", "1");
 
-  // Eventos MindAR
-  entity.addEventListener("targetFound", () => {
-    currentCountry = country;
+      const text = document.createElement("a-text");
+      text.setAttribute("value", country.name.toUpperCase());
+      text.setAttribute("align", "center");
+      text.setAttribute("position", "0 0 0.1");
 
-    showHUD();
-    setStatus(`Cargando datos de ${country.name}...`);
+      const ball = document.createElement("a-entity");
+      ball.setAttribute("gltf-model", "#soccerBallGLB");
+      ball.setAttribute("position", "0 0.25 0.15");
+      ball.setAttribute("scale", "0.35 0.35 0.35");
+      ball.setAttribute("rotation", "0 0 0");
+      ball.setAttribute("class", "clickable");
 
-    updateVideoUIForCountry(country);
+      ball.addEventListener("click", (e) => {
+        if (typeof e.stopPropagation === "function") e.stopPropagation();
 
-    // Conectar con la Base de Datos
-    if (window.cargarDatosDesdeBD && country.code) {
-      window.cargarDatosDesdeBD(country.code).then((datos) => {
-        if (datos) {
-          const estadioNombre = datos.estadio_nombre || 'Info no encontrada';
-          setStatus(`${country.name.toUpperCase()}: ${estadioNombre} (BD)`);
-        } else {
-          setStatus(`Error al cargar datos de ${country.name}`);
+        if (ball.hasAttribute("animation__spin")) {
+          ball.removeAttribute("animation__spin");
+          return;
+        }
+
+        ball.setAttribute(
+          "animation__spin",
+          "property: rotation; to: 0 360 0; loop: true; dur: 1200; easing: linear"
+        );
+      });
+
+      entity.addEventListener("targetFound", () => {
+        currentCountry = country;
+        showHUD();
+        setStatus(`Cargando datos de ${country.name}...`);
+        updateVideoUIForCountry(country);
+
+        if (window.cargarDatosDesdeBD && country.code) {
+          window.cargarDatosDesdeBD(country.code).then((datos) => {
+            const estadioNombre = datos?.estadio_nombre || "Info no encontrada";
+            setStatus(`${country.name.toUpperCase()}: ${estadioNombre} (BD)`);
+          });
         }
       });
-    }
+
+      entity.addEventListener("targetLost", () => {
+        currentCountry = null;
+        hideHUD();
+        closeAllModals();
+        setStatus("Apunta a una bandera...");
+
+        if (window.Trivia && typeof window.Trivia.reset === "function") {
+          window.Trivia.reset();
+        }
+      });
+
+      plane.addEventListener("click", () => {
+        window.open(
+          `https://www.google.com/search?q=seleccion+${country.id}+mundial+2026`,
+          "_blank"
+        );
+      });
+
+      entity.appendChild(plane);
+      entity.appendChild(text);
+      entity.appendChild(ball);
+      scene.appendChild(entity);
+    });
   });
-
-  entity.addEventListener("targetLost", () => {
-  currentCountry = null;
-
-  hideHUD();
-  closeAllModals();
-  setStatus("Apunta a una bandera...");
-
-  // ✅ opcional: limpiar estado de trivia
-  if (window.Trivia && typeof window.Trivia.reset === "function") {
-    window.Trivia.reset();
-  }
-});
-
-
-  // Mantengo tu click a Google
-  plane.addEventListener("click", () => {
-    window.open(
-      `https://www.google.com/search?q=seleccion+${country.id}+mundial+2026`,
-      "_blank"
-    );
-  });
-
-  entity.appendChild(plane);
-  entity.appendChild(text);
-  scene.appendChild(entity);
-});
-
-// Arrancar MindAR con targets
-scene.setAttribute(
-  "mindar-image",
-  `imageTargetSrc: ./assets/targets.mind; uiError: yes; uiLoading: yes;`
-);
+}

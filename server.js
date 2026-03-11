@@ -8,7 +8,7 @@ const port = 3000;
 const db = mysql.createPool({
     host: 'localhost',
     user: 'root',      // CAMBIAR POR TU USUARIO
-    password: 'root',      // CAMBIAR POR TU CONTRASEÑA
+    password: '',      // CAMBIAR POR TU CONTRASEÑA
     database: 'mundial_ar',
     waitForConnections: true,
     connectionLimit: 10,
