@@ -11,8 +11,24 @@
   <link rel="stylesheet" href="./css/styles.css" />
 
   <style>
-    body { margin: 0; overflow: hidden; background-color:#181A18; }
-  </style>
+  body { margin: 0; overflow: hidden; background-color:#181A18; }
+
+  #fx-stars{
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    object-fit: cover;
+    pointer-events: none;
+    opacity: 0;
+    z-index: 9999;
+    transition: opacity .25s ease;
+  }
+
+  #fx-stars.show{
+    opacity: .95;
+  }
+</style>
 </head>
 
 <body>
@@ -34,7 +50,11 @@
     <button class="hud-btn" type="button" data-modal="modal-stats">📊 Estadísticas</button>
     <button class="hud-btn" type="button" data-modal="modal-estadio">🏟 Información del Estadio</button>
     <button class="hud-btn" type="button" data-modal="modal-trivia">🎮 Trivia</button>
+    <button class="hud-btn" id="btn-ar-animation" type="button">✨ Activar animación</button>
   </div>
+
+  <!-- Overlay de partículas -->
+  <img id="fx-stars" src="./assets/img/estrellas.gif" alt="" aria-hidden="true" />
 
   <!-- =========================================================
        MODAL: VIDEO + FILTROS (FE)

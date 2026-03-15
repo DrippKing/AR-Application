@@ -1,19 +1,18 @@
 // =====================================================
-// WorldScan 2026 — script.js (COMPLETO)
+// WorldScan 2026 — script.js (ACTUALIZADO)
 // - MindAR targets
 // - HUD aparece al detectar bandera
 // - Modales abren/cierran
-// - Video + Acervo funcional (cambia src y título)
-// - Filtros permitidos (FE) funcionales a nivel demo:
-//    * Desenfoque: CSS filter (blur)
-//    * Ajuste de color: CSS filter (saturate + contrast + hue-rotate)  ✅ (no es "exposición")
-//    * Pixelado / Térmica / Custom: overlays visuales (NO filtros prohibidos)
-// - ✅ Pelota 3D GLB aparece en AR por target + tap para girar
+// - Video + Acervo funcional
+// - Filtros permitidos FE
+// - Pelota 3D GLB aparece en AR por target
+// - Tap para girar
+// - Botón HUD para rebote
+// - Partículas overlay (GIF)
+// - Textura distinta según bandera escaneada
 // =====================================================
 
-
 // --- HACK DE ALTA RESOLUCIÓN (S25 Ultra Fix) ---
-// Interceptamos la petición de cámara para forzar Full HD
 if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
   const originalGUM = navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);
   navigator.mediaDevices.getUserMedia = function (constraints) {
@@ -31,26 +30,17 @@ if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
 }
 
 // =====================================================
-// FIX 100vh en móviles (evita saltos por barra del navegador)
-// - Crea/actualiza la variable CSS --vh
+// FIX 100vh en móviles
 // =====================================================
 function setVhVar() {
   const vh = window.innerHeight * 0.01;
   document.documentElement.style.setProperty("--vh", `${vh}px`);
 }
-
-// Set inicial
 setVhVar();
-
-// Recalcular cuando cambie el tamaño (rotación / UI del navegador)
 window.addEventListener("resize", setVhVar);
-
-// iOS a veces dispara "orientationchange" aparte
 window.addEventListener("orientationchange", () => {
-  // pequeño delay para que el alto final se estabilice
   setTimeout(setVhVar, 150);
 });
-
 
 // --- DATOS DE PAÍSES ---
 const countries = [
@@ -72,6 +62,8 @@ const statusText = document.getElementById("status-text");
 // --- HUD + MODALES ---
 const hud = document.getElementById("hud");
 const modals = Array.from(document.querySelectorAll(".modal"));
+const arAnimationBtn = document.getElementById("btn-ar-animation");
+const starsFx = document.getElementById("fx-stars");
 
 // Video editor UI
 const videoModal = document.getElementById("modal-video");
@@ -82,8 +74,27 @@ const filterButtons = Array.from(document.querySelectorAll("#modal-video .filter
 const playerShell = document.querySelector("#modal-video .player-shell");
 
 let currentCountry = null;
+let currentBall = null;
+let currentTargetEntity = null;
+let starsTimeout = null;
 
-// Helpers para evitar que truene si status-text está comentado en el HTML
+// Mapa de rutas de texturas por país
+const flagTextures = {
+  colombia: "./assets/img/Colombia.jpg",
+  coreadelsur: "./assets/img/Corea_del_Sur.jpg",
+  espana: "./assets/img/España.jpg",
+  japon: "./assets/img/Japon.jpg",
+  mexico: "./assets/img/Mexico.jpg",
+  paisesbajos: "./assets/img/Paises_Bajos.jpg",
+  sudafrica: "./assets/img/Sudafrica.jpg",
+  tunez: "./assets/img/Tunez.jpg",
+  uruguay: "./assets/img/Uruguay.jpg",
+  uzbekistan: "./assets/img/Uzbekistan.jpg",
+};
+
+// Cache de texturas para no recargar a cada rato
+const textureCache = {};
+
 function setStatus(msg) {
   if (statusText) statusText.innerText = msg;
 }
@@ -108,19 +119,41 @@ function openModalById(id) {
 
   modal.classList.remove("hidden");
 
-  // ✅ reset de scroll (card y modal)
   const card = modal.querySelector(".modal-card");
   if (card) card.scrollTop = 0;
   modal.scrollTop = 0;
 }
 
-
-// Estado inicial seguro
 hideHUD();
 closeAllModals();
 
+// =====================================================
+// Partículas overlay (GIF)
+// =====================================================
+function playStarsFX(duration = 2000) {
+  if (!starsFx) return;
 
-// --- HUD -> abrir modales ---
+  starsFx.classList.remove("show");
+
+  // Reinicia el GIF forzando recarga visual
+  const currentSrc = starsFx.getAttribute("src");
+  starsFx.setAttribute("src", "");
+  starsFx.offsetHeight; // reflow
+  starsFx.setAttribute("src", currentSrc);
+
+  requestAnimationFrame(() => {
+    starsFx.classList.add("show");
+  });
+
+  clearTimeout(starsTimeout);
+  starsTimeout = setTimeout(() => {
+    starsFx.classList.remove("show");
+  }, duration);
+}
+
+// =====================================================
+// HUD -> abrir modales
+// =====================================================
 if (hud) {
   hud.addEventListener("click", (e) => {
     const btn = e.target.closest("[data-modal]");
@@ -131,11 +164,8 @@ if (hud) {
 
     openModalById(modalId);
 
-    // ✅ HOOK: iniciar trivia cuando se abre el modal
     if (modalId === "modal-trivia") {
       const countryId = currentCountry ? currentCountry.id : null;
-
-      // Si trivia.js todavía no cargó, no truenes
       if (window.Trivia && typeof window.Trivia.start === "function") {
         window.Trivia.start(countryId);
       }
@@ -143,29 +173,40 @@ if (hud) {
   });
 }
 
+// Botón especial para animación AR
+if (arAnimationBtn) {
+  arAnimationBtn.addEventListener("click", () => {
+    if (!currentBall || !currentCountry) {
+      alert("Primero escanea una bandera para activar la animación AR.");
+      return;
+    }
 
-// --- Cerrar modales (X / botón Cerrar) ---
+    triggerBounce(currentBall);
+    playStarsFX(2000);
+  });
+}
+
+// =====================================================
+// Cerrar modales
+// =====================================================
 document.addEventListener("click", (e) => {
   if (e.target.closest("[data-close]")) {
     closeAllModals();
   }
 });
 
-// Cerrar modal al tocar afuera del card
 modals.forEach((modal) => {
   modal.addEventListener("click", (e) => {
     if (e.target === modal) closeAllModals();
   });
 });
 
-// Cerrar con ESC
 document.addEventListener("keydown", (e) => {
   if (e.key === "Escape") closeAllModals();
 });
 
-
 // =====================================================
-// VIDEO + ACERVO (funcional)
+// VIDEO + ACERVO
 // =====================================================
 function setActiveVideoItem(activeBtn) {
   videoItems.forEach((b) => b.classList.remove("active"));
@@ -176,17 +217,12 @@ function setVideoSource(src, titleText) {
   if (!videoPreview) return;
 
   if (titleText && videoTitle) videoTitle.textContent = titleText;
-
-  // Si el item no tiene src (placeholder), no hacemos nada
   if (!src) return;
 
-  // Cambiar fuente y recargar
   videoPreview.src = src;
   try {
     videoPreview.load();
   } catch (_) {}
-
-  // No forzamos autoplay para no pelear con políticas móviles.
 }
 
 if (videoItems.length) {
@@ -200,15 +236,9 @@ if (videoItems.length) {
   });
 }
 
-
 // =====================================================
-// FILTROS (FE) — demo funcional sin usar prohibidos
-// - Blur: blur()
-// - Color: saturate/contrast/hue-rotate (no exposure)
-// - Pixel / Thermal / Custom: overlay visual en player-shell
+// FILTROS (FE)
 // =====================================================
-
-// Crea overlay si no existe
 function ensureOverlay() {
   if (!playerShell) return null;
 
@@ -216,7 +246,6 @@ function ensureOverlay() {
   if (!overlay) {
     overlay = document.createElement("div");
     overlay.className = "fx-overlay";
-    // estilos inline mínimos para que funcione aunque no tengas CSS extra
     overlay.style.position = "absolute";
     overlay.style.inset = "0";
     overlay.style.pointerEvents = "none";
@@ -230,10 +259,8 @@ function ensureOverlay() {
 }
 
 function clearVisualFX() {
-  // Resetea filtros CSS del video
   if (videoPreview) videoPreview.style.filter = "none";
 
-  // Resetea overlay
   const overlay = ensureOverlay();
   if (overlay) {
     overlay.style.opacity = "0";
@@ -248,7 +275,6 @@ function setOverlayPixel() {
   const overlay = ensureOverlay();
   if (!overlay) return;
 
-  // Patrón de pixeles (UI demo)
   overlay.style.opacity = "0.55";
   overlay.style.mixBlendMode = "multiply";
   overlay.style.backgroundImage =
@@ -261,7 +287,6 @@ function setOverlayThermal() {
   const overlay = ensureOverlay();
   if (!overlay) return;
 
-  // Gradiente tipo térmica (UI demo)
   overlay.style.opacity = "0.42";
   overlay.style.mixBlendMode = "screen";
   overlay.style.background =
@@ -272,7 +297,6 @@ function setOverlayCustom() {
   const overlay = ensureOverlay();
   if (!overlay) return;
 
-  // "Pastel suave" (UI demo)
   overlay.style.opacity = "0.30";
   overlay.style.mixBlendMode = "soft-light";
   overlay.style.background =
@@ -286,23 +310,19 @@ function setCssBlur() {
 
 function setCssColorAdjust() {
   if (!videoPreview) return;
-  // Ajuste de color sin tocar exposición: saturación + contraste + hue
   videoPreview.style.filter = "saturate(1.25) contrast(1.08) hue-rotate(-6deg)";
 }
 
-// UI: activar chip
 function setActiveFilterButton(activeBtn) {
   filterButtons.forEach((b) => b.classList.remove("active"));
   if (activeBtn) activeBtn.classList.add("active");
 }
 
-// Click en filtros
 filterButtons.forEach((btn) => {
   btn.addEventListener("click", () => {
     const name = btn.dataset.filter;
-
-    // Toggle: si ya estaba activo, apaga todo
     const wasActive = btn.classList.contains("active");
+
     if (wasActive) {
       setActiveFilterButton(null);
       clearVisualFX();
@@ -312,7 +332,6 @@ filterButtons.forEach((btn) => {
     setActiveFilterButton(btn);
     clearVisualFX();
 
-    // Aplicar demo visual
     if (name === "blur") setCssBlur();
     if (name === "color") setCssColorAdjust();
     if (name === "pixel") setOverlayPixel();
@@ -321,22 +340,124 @@ filterButtons.forEach((btn) => {
   });
 });
 
-
-// =====================================================
-// Actualizar UI del video según país detectado
-// (solo cambia texto; el video se selecciona desde el acervo)
-// =====================================================
 function updateVideoUIForCountry(country) {
   if (!country) return;
   if (videoTitle) videoTitle.textContent = `Video oficial — ${country.name}`;
 }
 
+// =====================================================
+// Utilidades AR
+// =====================================================
+function stopBounce(ball) {
+  if (!ball) return;
+  ball.removeAttribute("animation__bounceUp");
+  ball.removeAttribute("animation__bounceDown");
+}
+
+function triggerBounce(ball) {
+  if (!ball) return;
+
+  stopBounce(ball);
+
+  ball.setAttribute("position", "0 0.25 0.15");
+
+  ball.setAttribute(
+    "animation__bounceUp",
+    "property: position; from: 0 0.25 0.15; to: 0 0.48 0.15; dur: 320; easing: easeOutQuad; startEvents: doBounceUp"
+  );
+
+  ball.setAttribute(
+    "animation__bounceDown",
+    "property: position; from: 0 0.48 0.15; to: 0 0.25 0.15; dur: 380; easing: easeInQuad; startEvents: doBounceDown"
+  );
+
+  const onBounceUpComplete = () => {
+    ball.emit("doBounceDown");
+  };
+
+  const onBounceDownComplete = () => {
+    ball.removeEventListener("animationcomplete__bounceUp", onBounceUpComplete);
+    ball.removeEventListener("animationcomplete__bounceDown", onBounceDownComplete);
+  };
+
+  ball.addEventListener("animationcomplete__bounceUp", onBounceUpComplete);
+  ball.addEventListener("animationcomplete__bounceDown", onBounceDownComplete);
+
+  ball.emit("doBounceUp");
+}
+
+function toggleSpin(ball) {
+  if (!ball) return;
+
+  if (ball.hasAttribute("animation__spin")) {
+    ball.removeAttribute("animation__spin");
+    return;
+  }
+
+  ball.setAttribute(
+    "animation__spin",
+    "property: rotation; to: 0 360 0; loop: true; dur: 1200; easing: linear"
+  );
+}
+
+function loadTexture(path) {
+  return new Promise((resolve, reject) => {
+    if (textureCache[path]) {
+      resolve(textureCache[path]);
+      return;
+    }
+
+    const loader = new THREE.TextureLoader();
+    loader.load(
+      path,
+      (texture) => {
+        texture.flipY = false;
+        texture.wrapS = THREE.RepeatWrapping;
+        texture.wrapT = THREE.ClampToEdgeWrapping;
+        texture.repeat.set(1, 1);
+        textureCache[path] = texture;
+        resolve(texture);
+      },
+      undefined,
+      reject
+    );
+  });
+}
+
+async function applyCountryTexture(ball, countryId) {
+  if (!ball || !countryId) return;
+
+  const texturePath = flagTextures[countryId];
+  if (!texturePath) return;
+
+  try {
+    const texture = await loadTexture(texturePath);
+
+    const applyToMesh = () => {
+      const object3D = ball.getObject3D("mesh");
+      if (!object3D) return;
+
+      object3D.traverse((node) => {
+        if (node.isMesh && node.material) {
+          node.material.map = texture;
+          node.material.color = new THREE.Color(0xffffff);
+          node.material.needsUpdate = true;
+        }
+      });
+    };
+
+    if (ball.getObject3D("mesh")) {
+      applyToMesh();
+    } else {
+      ball.addEventListener("model-loaded", applyToMesh, { once: true });
+    }
+  } catch (error) {
+    console.warn("No se pudo aplicar textura al balón:", texturePath, error);
+  }
+}
 
 // =====================================================
 // MindAR: generación automática de targets
-// =====================================================
-// =====================================================
-// MindAR: generación automática de targets (cuando scene esté listo)
 // =====================================================
 if (!scene) {
   console.warn("No se encontró #ar-scene");
@@ -358,7 +479,9 @@ if (!scene) {
       const text = document.createElement("a-text");
       text.setAttribute("value", country.name.toUpperCase());
       text.setAttribute("align", "center");
-      text.setAttribute("position", "0 0 0.1");
+      text.setAttribute("position", "0 -0.45 0.1");
+      text.setAttribute("color", "#FFFFFF");
+      text.setAttribute("width", "2");
 
       const ball = document.createElement("a-entity");
       ball.setAttribute("gltf-model", "#soccerBallGLB");
@@ -369,23 +492,20 @@ if (!scene) {
 
       ball.addEventListener("click", (e) => {
         if (typeof e.stopPropagation === "function") e.stopPropagation();
-
-        if (ball.hasAttribute("animation__spin")) {
-          ball.removeAttribute("animation__spin");
-          return;
-        }
-
-        ball.setAttribute(
-          "animation__spin",
-          "property: rotation; to: 0 360 0; loop: true; dur: 1200; easing: linear"
-        );
+        toggleSpin(ball);
       });
 
-      entity.addEventListener("targetFound", () => {
+      entity.addEventListener("targetFound", async () => {
         currentCountry = country;
+        currentBall = ball;
+        currentTargetEntity = entity;
+
         showHUD();
         setStatus(`Cargando datos de ${country.name}...`);
         updateVideoUIForCountry(country);
+
+        await applyCountryTexture(ball, country.id);
+        playStarsFX(1800);
 
         if (window.cargarDatosDesdeBD && country.code) {
           window.cargarDatosDesdeBD(country.code).then((datos) => {
@@ -396,10 +516,17 @@ if (!scene) {
       });
 
       entity.addEventListener("targetLost", () => {
-        currentCountry = null;
+        if (currentTargetEntity === entity) {
+          currentCountry = null;
+          currentBall = null;
+          currentTargetEntity = null;
+        }
+
         hideHUD();
         closeAllModals();
         setStatus("Apunta a una bandera...");
+
+        stopBounce(ball);
 
         if (window.Trivia && typeof window.Trivia.reset === "function") {
           window.Trivia.reset();
