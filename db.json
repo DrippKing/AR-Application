@@ -1,15 +1,15 @@
 {
   "paises": [
-    { "codigo": "MEX", "nombre": "México", "grupo": "A", "ranking_fifa": 15, "video_url": "./videoCuatro.mp4", "estadio_nombre": "Estadio Azteca", "estadio_ciudad": "Ciudad de México", "capacidad": 87523 },
-    { "codigo": "COL", "nombre": "Colombia", "grupo": "C", "ranking_fifa": 17, "video_url": "./videoCuatro.mp4", "estadio_nombre": "Estadio Metropolitano", "estadio_ciudad": "Barranquilla", "capacidad": 46692 },
-    { "codigo": "JPN", "nombre": "Japón", "grupo": "E", "ranking_fifa": 18, "video_url": "./videoCuatro.mp4", "estadio_nombre": "Estadio Nacional", "estadio_ciudad": "Tokio", "capacidad": 68000 },
-    { "codigo": "ESP", "nombre": "España", "grupo": "B", "ranking_fifa": 8, "video_url": "./videoCuatro.mp4", "estadio_nombre": "Santiago Bernabéu", "estadio_ciudad": "Madrid", "capacidad": 81044 },
-    { "codigo": "KOR", "nombre": "Corea del Sur", "grupo": "H", "ranking_fifa": 23, "video_url": "./videoCuatro.mp4", "estadio_nombre": "Seoul World Cup Stadium", "estadio_ciudad": "Seúl", "capacidad": 66704 },
-    { "codigo": "NED", "nombre": "Países Bajos", "grupo": "D", "ranking_fifa": 6, "video_url": "./videoCuatro.mp4", "estadio_nombre": "Johan Cruyff Arena", "estadio_ciudad": "Ámsterdam", "capacidad": 55500 },
-    { "codigo": "RSA", "nombre": "Sudáfrica", "grupo": "F", "ranking_fifa": 66, "video_url": "./videoCuatro.mp4", "estadio_nombre": "FNB Stadium", "estadio_ciudad": "Johannesburgo", "capacidad": 94736 },
-    { "codigo": "TUN", "nombre": "Túnez", "grupo": "G", "ranking_fifa": 30, "video_url": "./videoCuatro.mp4", "estadio_nombre": "Stade Hammadi Agrebi", "estadio_ciudad": "Radès", "capacidad": 60000 },
-    { "codigo": "URU", "nombre": "Uruguay", "grupo": "H", "ranking_fifa": 16, "video_url": "./videoCuatro.mp4", "estadio_nombre": "Estadio Centenario", "estadio_ciudad": "Montevideo", "capacidad": 60235 },
-    { "codigo": "UZB", "nombre": "Uzbekistán", "grupo": "A", "ranking_fifa": 73, "video_url": "./videoCuatro.mp4", "estadio_nombre": "Milliy Stadium", "estadio_ciudad": "Taskent", "capacidad": 34000 }
+    { "codigo": "MEX", "nombre": "México", "grupo": "A", "ranking_fifa": 15, "video_url": "./assets/movies/Germany v Mexico  2018 FIFA World Cup  Match Highlights.mp4", "estadio_nombre": "Estadio Azteca", "estadio_ciudad": "Ciudad de México", "capacidad": 87523 },
+    { "codigo": "COL", "nombre": "Colombia", "grupo": "C", "ranking_fifa": 17, "video_url": "./assets/movies/Colombia v Uruguay  2014 FIFA World Cup  Match Highlights.mp4", "estadio_nombre": "Estadio Metropolitano", "estadio_ciudad": "Barranquilla", "capacidad": 46692 },
+    { "codigo": "JPN", "nombre": "Japón", "grupo": "E", "ranking_fifa": 18, "video_url": "./assets/movies/Another famous comeback win  Japan v Spain  FIFA World Cup Qatar 2022.mp4", "estadio_nombre": "Estadio Nacional", "estadio_ciudad": "Tokio", "capacidad": 68000 },
+    { "codigo": "ESP", "nombre": "España", "grupo": "B", "ranking_fifa": 8, "video_url": "./assets/movies/2010 WORLD CUP FINAL_ Netherlands 0-1 Spain (AET).mp4", "estadio_nombre": "Santiago Bernabéu", "estadio_ciudad": "Madrid", "capacidad": 81044 },
+    { "codigo": "KOR", "nombre": "Corea del Sur", "grupo": "H", "ranking_fifa": 23, "video_url": "./assets/movies/Korea Republic v Germany  2018 FIFA World Cup  Match Highlights.mp4", "estadio_nombre": "Seoul World Cup Stadium", "estadio_ciudad": "Seúl", "capacidad": 66704 },
+    { "codigo": "NED", "nombre": "Países Bajos", "grupo": "D", "ranking_fifa": 6, "video_url": "./assets/movies/Spain v Netherlands  2014 FIFA World Cup  Match Highlights.mp4", "estadio_nombre": "Johan Cruyff Arena", "estadio_ciudad": "Ámsterdam", "capacidad": 55500 },
+    { "codigo": "RSA", "nombre": "Sudáfrica", "grupo": "F", "ranking_fifa": 66, "video_url": "./assets/movies/South Africa v Mexico  2010 FIFA World Cup  Match Highlights.mp4", "estadio_nombre": "FNB Stadium", "estadio_ciudad": "Johannesburgo", "capacidad": 94736 },
+    { "codigo": "TUN", "nombre": "Túnez", "grupo": "G", "ranking_fifa": 30, "video_url": "./assets/movies/Famous win not quite enough  Tunisa v France  FIFA World Cup Qatar 2022.mp4", "estadio_nombre": "Stade Hammadi Agrebi", "estadio_ciudad": "Radès", "capacidad": 60000 },
+    { "codigo": "URU", "nombre": "Uruguay", "grupo": "H", "ranking_fifa": 16, "video_url": "./assets/movies/Uruguay v Ghana  2010 FIFA World Cup  Match Highlights.mp4", "estadio_nombre": "Estadio Centenario", "estadio_ciudad": "Montevideo", "capacidad": 60235 },
+    { "codigo": "UZB", "nombre": "Uzbekistán", "grupo": "A", "ranking_fifa": 73, "video_url": "./assets/movies/BLAZING Uzbekistan crown historic campaign!  Uzbekistan - Qatar  Highlights #AsianQualifiers RT 26.mp4", "estadio_nombre": "Milliy Stadium", "estadio_ciudad": "Taskent", "capacidad": 34000 }
   ],
   "trivias": [
     { "pais_codigo": "MEX", "pregunta": "¿En qué año fue el primer mundial en México?", "opciones": ["1970", "1986", "1994"], "respuesta_correcta": 0 },

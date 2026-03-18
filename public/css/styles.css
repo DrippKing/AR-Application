@@ -37,12 +37,12 @@ body{
   width: min(100%, 1200px);
   left:50%;
   transform:translateX(-50%);
-  height:120px;
+  height:auto;
   background-image: linear-gradient(to right, #08b059, #00b1e8, #203771);
   display:flex;
   justify-content:center;
-  padding:10px;
-  border-radius:18px;
+  padding:8px 14px;
+  border-radius:14px;
   border:1px solid rgba(255,255,255,0.15);
   box-shadow:0 12px 30px rgba(0,0,0,0.25);
 }
@@ -63,7 +63,7 @@ body{
 
 .banner-text h1{
   margin:0;
-  font-size:28px;
+  font-size:20px;
   line-height:1.1;
 }
 
@@ -75,6 +75,7 @@ body{
   width:100%;
   white-space:nowrap;
   line-height:1.1;
+  font-size:11px;
 }
 
 .banner-text h3::before{
@@ -147,6 +148,12 @@ body{
 
   /* evita que el texto reviente */
   white-space:nowrap;
+}
+
+.hud-btn:disabled{
+  opacity:0.4;
+  cursor:not-allowed;
+  transform:none;
 }
 
 .hud-btn:hover{
@@ -532,11 +539,10 @@ body{
 
 @media (max-width: 900px){
   #tittle-banner{
-    height:auto;
     padding:10px 12px;
   }
   .banner-text h1{
-    font-size:22px;
+    font-size:18px;
   }
 
   .editor-grid{
@@ -565,11 +571,11 @@ body{
   #tittle-banner{
     top: calc(8px + var(--safe-t));
     width: calc(100% - 16px);
-    border-radius:16px;
+    border-radius:12px;
   }
 
-  .banner-text h1{ font-size:20px; }
-  .banner-text h3{ font-size:12px; }
+  .banner-text h1{ font-size:18px; }
+  .banner-text h3{ font-size:10px; }
 
   .hud{
     bottom: calc(12px + var(--safe-b));

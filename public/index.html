@@ -33,10 +33,23 @@
 
 <body>
 
+  <!-- Filtro SVG para efecto Pixelado Real -->
+  <svg style="position: absolute; width: 0; height: 0;" aria-hidden="true">
+    <defs>
+      <filter id="pixelate-effect">
+        <feFlood x="4" y="4" height="2" width="2"/>
+        <feComposite width="10" height="10"/>
+        <feTile result="a"/>
+        <feComposite in="SourceGraphic" in2="a" operator="in"/>
+        <feMorphology operator="dilate" radius="5"/>
+      </filter>
+    </defs>
+  </svg>
+
   <!-- Banner superior -->
   <div id="tittle-banner">
     <div id="logo">
-      <img src="./assets/trionda_ball.png" alt="Logo Mundial 2026" width="50" height="50" />
+      <img src="./assets/trionda_ball.png" alt="Logo Mundial 2026" width="36" height="36" />
       <div class="banner-text">
         <h1>WorldScan</h1>
         <h3>2026</h3>
@@ -88,7 +101,6 @@
         <h2 id="video-title" class="video-title">Video oficial — País detectado</h2>
         <p class="video-sub">
           Selecciona un video del acervo y aplica filtros permitidos.
-          (Hoy: UI + prueba funcional con 1 video).
         </p>
       </div>
 
@@ -111,7 +123,7 @@
             preload="metadata"
             playsinline
             controls
-            src="./videoCuatro.mp4"
+            src="./assets/movies/Germany v Mexico  2018 FIFA World Cup  Match Highlights.mp4"
           ></video>
 
           <!-- Overlay tipo marcador (futbolero) -->
@@ -133,38 +145,15 @@
 
             <!-- Item real -->
             <button class="video-item active" type="button"
-                    data-src="./videoCuatro.mp4"
-                    data-title="Video oficial — Highlights (videoCuatro)">
+                    data-src="./assets/movies/Germany v Mexico  2018 FIFA World Cup  Match Highlights.mp4"
+                    data-title="Video oficial — Highlights">
               <div class="thumb">
                 <span class="thumb-tag">OFICIAL</span>
                 <span class="thumb-play">▶</span>
               </div>
               <div class="meta">
                 <div class="meta-title">Highlights — Oficial</div>
-                <div class="meta-sub">videoCuatro.mp4</div>
-              </div>
-            </button>
-
-            <!-- Placeholders (para “acervo” visual) -->
-            <button class="video-item" type="button" data-src="" data-title="Video oficial — Próximamente">
-              <div class="thumb thumb--ghost">
-                <span class="thumb-tag">ACERVO</span>
-                <span class="thumb-play">▶</span>
-              </div>
-              <div class="meta">
-                <div class="meta-title">Top Goles — (placeholder)</div>
-                <div class="meta-sub">Próximamente</div>
-              </div>
-            </button>
-
-            <button class="video-item" type="button" data-src="" data-title="Video oficial — Próximamente">
-              <div class="thumb thumb--ghost">
-                <span class="thumb-tag">ACERVO</span>
-                <span class="thumb-play">▶</span>
-              </div>
-              <div class="meta">
-                <div class="meta-title">Mejores Jugadas — (placeholder)</div>
-                <div class="meta-sub">Próximamente</div>
+                <div class="meta-sub">Germany v Mexico...</div>
               </div>
             </button>
 
@@ -198,21 +187,15 @@
             <span class="chip-txt">Ajuste de color</span>
           </button>
 
-          <button class="filter-chip" type="button" data-filter="custom" aria-pressed="false">
-            <span class="chip-ic">⭐</span>
-            <span class="chip-txt">Filtro custom</span>
+          <button class="filter-chip" type="button" data-filter="fisheye" aria-pressed="false">
+            <span class="chip-ic">🐟</span>
+            <span class="chip-txt">Ojo de pescado</span>
           </button>
-        </div>
-
-        <div class="fe-note">
-          ✅ No se incluyen filtros prohibidos (B/N, grises, sepia, exposición, invertido).
-          Aquí solo se habilita selección y “highlight” (y si quieres, una previsualización simple).
         </div>
       </div>
 
       <!-- Footer -->
       <div class="video-footer">
-        <small>Avance: acervo + reproductor + UI de filtros (listo para conectar procesamiento real).</small>
         <button class="primary-btn" type="button" data-close>Cerrar</button>
       </div>
 

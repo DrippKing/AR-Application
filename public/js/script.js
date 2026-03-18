@@ -104,6 +104,214 @@ function setupCameraControls() {
 }
 
 // =====================================================
+// COMPONENTE AR: Drag-to-Rotate (Con inercia y World Space)
+// =====================================================
+AFRAME.registerComponent('simple-drag-rotator', {
+  schema: {
+    sensitivity: { type: 'number', default: 1.5 },
+    friction: { type: 'number', default: 0.98 } // Desaceleración: 1 = nunca se detiene, 0 = se detiene al soltar
+  },
+
+  init: function () {
+    this.isDragging = false;
+    this.previousPointerPosition = { x: 0, y: 0 };
+    this.needsPointerReset = false;
+    this.spinVelocity = { x: 0, y: 0 }; // Guarda la velocidad y dirección del último deslizamiento
+
+    // Bind 'this' para preservar el contexto en los listeners
+    this.onMouseDown = this.onMouseDown.bind(this);
+    this.onMouseMove = this.onMouseMove.bind(this);
+    this.onMouseUp = this.onMouseUp.bind(this);
+
+    // Listeners iniciales sobre el objeto
+    this.el.addEventListener('mousedown', this.onMouseDown);
+    this.el.addEventListener('touchstart', this.onMouseDown);
+  },
+
+  remove: function () {
+    // Limpieza completa de listeners para evitar fugas de memoria
+    this.el.removeEventListener('mousedown', this.onMouseDown);
+    this.el.removeEventListener('touchstart', this.onMouseDown);
+    window.removeEventListener('mousemove', this.onMouseMove);
+    window.removeEventListener('mouseup', this.onMouseUp);
+    window.removeEventListener('touchmove', this.onMouseMove, { passive: false });
+    window.removeEventListener('touchend', this.onMouseUp);
+  },
+
+  onMouseDown: function (evt) {
+    // Detiene la propagación para que no interfiera con el raycaster de A-Frame
+    this.isDragging = true;
+    this.spinVelocity = { x: 0, y: 0 }; // Detiene cualquier giro inercial previo al volver a tocar
+    
+    const pointer = this.getPointerPosition(evt);
+    if (pointer) {
+      this.previousPointerPosition = { x: pointer.x, y: pointer.y };
+      this.needsPointerReset = false;
+    } else {
+      // Si no logramos leer la coordenada de A-Frame al tocar, 
+      // forzamos a que el primer movimiento fije el punto de partida.
+      this.needsPointerReset = true;
+    }
+
+    // Añadimos listeners a 'window' para capturar el arrastre fuera del objeto
+    window.addEventListener('mousemove', this.onMouseMove);
+    window.addEventListener('mouseup', this.onMouseUp);
+    window.addEventListener('touchmove', this.onMouseMove, { passive: false });
+    window.addEventListener('touchend', this.onMouseUp);
+  },
+
+  onMouseMove: function (evt) {
+    if (!this.isDragging) return;
+    
+    // Previene el scroll de la página, que rompe el tracking de AR
+    if (evt.cancelable) {
+      evt.preventDefault();
+    }
+
+    const pointer = this.getPointerPosition(evt);
+    if (!pointer) return;
+
+    // Si es el primer movimiento tras tocar, sincronizamos la posición y evitamos rotar
+    if (this.needsPointerReset || this.previousPointerPosition.x === undefined) {
+      this.previousPointerPosition = { x: pointer.x, y: pointer.y };
+      this.needsPointerReset = false;
+      return; 
+    }
+
+    const deltaX = pointer.x - this.previousPointerPosition.x;
+    const deltaY = pointer.y - this.previousPointerPosition.y;
+
+    // ¡CLAVE! Prevenir cálculos corruptos (NaN) que hacen desaparecer el modelo 3D
+    if (isNaN(deltaX) || isNaN(deltaY)) return;
+
+    // Guardar la velocidad para que la función tick() sepa hacia dónde y qué tan rápido girarlo
+    this.spinVelocity = { x: deltaX, y: deltaY };
+
+    // Convertir el movimiento a radianes
+    const angleY = deltaX * (Math.PI / 180) * this.data.sensitivity;
+    const angleX = deltaY * (Math.PI / 180) * this.data.sensitivity;
+
+    // Rotar sobre los ejes fijos del mundo (World Space) para evitar controles invertidos (Gimbal Lock)
+    this.el.object3D.rotateOnWorldAxis(new THREE.Vector3(0, 1, 0), angleY); // Giro horizontal
+    this.el.object3D.rotateOnWorldAxis(new THREE.Vector3(1, 0, 0), angleX); // Giro vertical
+
+    this.previousPointerPosition = { x: pointer.x, y: pointer.y };
+  },
+
+  onMouseUp: function () {
+    this.isDragging = false;
+    window.removeEventListener('mousemove', this.onMouseMove);
+    window.removeEventListener('mouseup', this.onMouseUp);
+    window.removeEventListener('touchmove', this.onMouseMove, { passive: false });
+    window.removeEventListener('touchend', this.onMouseUp);
+  },
+  
+  tick: function () {
+    // Si el usuario está tocando la pantalla, dejamos que onMouseMove controle el giro
+    if (this.isDragging) return;
+
+    // Si la velocidad es mínima, nos detenemos para ahorrar batería
+    if (Math.abs(this.spinVelocity.x) < 0.05 && Math.abs(this.spinVelocity.y) < 0.05) return;
+
+    // Girar el objeto usando la velocidad residual
+    const angleY = this.spinVelocity.x * (Math.PI / 180) * this.data.sensitivity;
+    const angleX = this.spinVelocity.y * (Math.PI / 180) * this.data.sensitivity;
+
+    this.el.object3D.rotateOnWorldAxis(new THREE.Vector3(0, 1, 0), angleY);
+    this.el.object3D.rotateOnWorldAxis(new THREE.Vector3(1, 0, 0), angleX);
+
+    // Aplicar fricción (desacelerar poco a poco)
+    this.spinVelocity.x *= this.data.friction;
+    this.spinVelocity.y *= this.data.friction;
+  },
+
+  getPointerPosition: function(evt) {
+    if (evt.touches && evt.touches.length > 0) {
+      return { x: evt.touches[0].clientX, y: evt.touches[0].clientY };
+    } else if (evt.clientX !== undefined && evt.clientY !== undefined) {
+      return { x: evt.clientX, y: evt.clientY };
+    } else if (evt.detail && evt.detail.mouseEvent) {
+      // ¡CLAVE! A-Frame esconde las coordenadas aquí
+      const mEvt = evt.detail.mouseEvent;
+      if (mEvt.touches && mEvt.touches.length > 0) {
+        return { x: mEvt.touches[0].clientX, y: mEvt.touches[0].clientY };
+      } else if (mEvt.clientX !== undefined && mEvt.clientY !== undefined) {
+        return { x: mEvt.clientX, y: mEvt.clientY };
+      }
+    }
+    return null; // Fallback seguro
+  }
+});
+
+// =====================================================
+// COMPONENTE AR: Físicas de rebote (Gravedad e Inercia)
+// =====================================================
+AFRAME.registerComponent('ball-physics', {
+  schema: {
+    gravity: { type: 'number', default: 0.010 }, // Fuerza con la que cae
+    jumpStrength: { type: 'number', default: 0.10 }, // Fuerza del golpe hacia arriba
+    bounceDamping: { type: 'number', default: 0.65 }, // Reducimos elasticidad para que pare pronto
+    maxHeight: { type: 'number', default: 2.0 } // Altura máxima permitida (acumulable)
+  },
+
+  init: function () {
+    this.velocityY = 0;
+    this.isBouncing = false;
+    this.groundY = 0; // El nivel del "suelo virtual"
+  },
+
+  jump: function () {
+    let pos = this.el.object3D.position;
+    // Si la pelota ya superó la altura máxima, no saltar más
+    if (pos.y >= this.data.maxHeight) return false;
+    
+    this.isBouncing = true;
+    this.velocityY = this.data.jumpStrength; // Impulso instantáneo hacia arriba
+    
+    // Retornamos true si el salto fue ejecutado
+    return true;
+  },
+
+  reset: function () {
+    this.isBouncing = false;
+    this.velocityY = 0;
+    this.el.object3D.position.y = this.groundY;
+    this.el.emit('bounce-stopped'); // Avisamos al exterior que el balón ya no se mueve
+  },
+
+  tick: function () {
+    if (!this.isBouncing) return;
+
+    let pos = this.el.object3D.position;
+    
+    pos.y += this.velocityY;
+    this.velocityY -= this.data.gravity; // Aplicar gravedad constante
+
+    // Obliga al balón a caer si sobrepasa la altura máxima permitida (Techo virtual)
+    if (pos.y >= this.data.maxHeight) {
+      pos.y = this.data.maxHeight;
+      if (this.velocityY > 0) {
+        this.velocityY = 0; // Pierde el impulso hacia arriba, empezará a caer instantáneamente
+      }
+      this.el.emit('max-height-reached'); // Avisa al botón para que se desactive
+    }
+
+    // Colisión con el piso virtual
+    if (pos.y <= this.groundY) {
+      pos.y = this.groundY;
+      
+      // Rebote invirtiendo la velocidad pero perdiendo energía
+      this.velocityY = -this.velocityY * this.data.bounceDamping;
+
+      // Aumentamos el umbral a 0.04 para evitar micro-rebotes infinitos
+      if (Math.abs(this.velocityY) < 0.04) {
+        this.reset();
+      }
+    }
+  }
+});
+
+// =====================================================
 // FIX 100vh en móviles
 // =====================================================
 function setVhVar() {
@@ -183,6 +391,11 @@ function hideHUD() {
 
 function closeAllModals() {
   modals.forEach((m) => m.classList.add("hidden"));
+
+  // Detener cualquier video que se esté reproduciendo
+  if (videoPreview && !videoPreview.paused) {
+    videoPreview.pause();
+  }
 }
 
 function openModalById(id) {
@@ -294,9 +507,7 @@ function setVideoSource(src, titleText) {
   if (!src) return;
 
   videoPreview.src = src;
-  try {
-    videoPreview.load();
-  } catch (_) {}
+  try { videoPreview.load(); } catch (_) {}
 }
 
 if (videoItems.length) {
@@ -333,7 +544,9 @@ function ensureOverlay() {
 }
 
 function clearVisualFX() {
-  if (videoPreview) videoPreview.style.filter = "none";
+  if (videoPreview) {
+    videoPreview.style.filter = "none";
+  }
 
   const overlay = ensureOverlay();
   if (overlay) {
@@ -346,15 +559,10 @@ function clearVisualFX() {
 }
 
 function setOverlayPixel() {
-  const overlay = ensureOverlay();
-  if (!overlay) return;
-
-  overlay.style.opacity = "0.55";
-  overlay.style.mixBlendMode = "multiply";
-  overlay.style.backgroundImage =
-    "linear-gradient(90deg, rgba(255,255,255,0.18) 1px, transparent 1px), linear-gradient(rgba(255,255,255,0.18) 1px, transparent 1px)";
-  overlay.style.backgroundSize = "10px 10px";
-  overlay.style.filter = "none";
+  if (videoPreview) {
+    // Aplicamos el filtro SVG inyectado en el HTML al reproductor de video
+    videoPreview.style.filter = "url(#pixelate-effect)";
+  }
 }
 
 function setOverlayThermal() {
@@ -367,14 +575,14 @@ function setOverlayThermal() {
     "linear-gradient(90deg, rgba(0,0,255,0.65), rgba(0,255,255,0.55), rgba(0,255,0,0.55), rgba(255,255,0,0.55), rgba(255,120,0,0.55), rgba(255,0,0,0.55))";
 }
 
-function setOverlayCustom() {
+function setOverlayFisheye() {
   const overlay = ensureOverlay();
   if (!overlay) return;
 
-  overlay.style.opacity = "0.30";
-  overlay.style.mixBlendMode = "soft-light";
+  overlay.style.opacity = "1";
+  overlay.style.mixBlendMode = "normal";
   overlay.style.background =
-    "radial-gradient(circle at 20% 30%, rgba(255,192,203,0.55), transparent 55%), radial-gradient(circle at 75% 40%, rgba(173,216,230,0.55), transparent 55%), radial-gradient(circle at 55% 80%, rgba(152,251,152,0.45), transparent 60%)";
+    "radial-gradient(circle at 50% 50%, transparent 38%, rgba(0,0,0,0.75) 65%, #000 98%), radial-gradient(ellipse at 50% 0%, rgba(255,255,255,0.2) 0%, transparent 40%)";
 }
 
 function setCssBlur() {
@@ -410,7 +618,7 @@ filterButtons.forEach((btn) => {
     if (name === "color") setCssColorAdjust();
     if (name === "pixel") setOverlayPixel();
     if (name === "thermal") setOverlayThermal();
-    if (name === "custom") setOverlayCustom();
+    if (name === "fisheye") setOverlayFisheye();
   });
 });
 
@@ -424,63 +632,23 @@ function updateVideoUIForCountry(country) {
 // =====================================================
 function stopBounce(ball) {
   if (!ball) return;
-  ball.removeAttribute("animation__bounceUp");
-  ball.removeAttribute("animation__bounceDown");
+  const physics = ball.components['ball-physics'];
+  if (physics) physics.reset();
 }
 
 function triggerBounce(ball) {
   if (!ball) return;
 
-  stopBounce(ball);
-
-  ball.setAttribute("position", "0 0 0");
-
-  ball.setAttribute(
-    "animation__bounceUp",
-    "property: position; from: 0 0 0; to: 0 0.3 0; dur: 320; easing: easeOutQuad; startEvents: doBounceUp"
-  );
-
-  ball.setAttribute(
-    "animation__bounceDown",
-    "property: position; from: 0 0.3 0; to: 0 0 0; dur: 380; easing: easeInQuad; startEvents: doBounceDown"
-  );
-
-  const onBounceUpComplete = () => {
-    ball.emit("doBounceDown");
-  };
-
-  const onBounceDownComplete = () => {
-    ball.removeEventListener("animationcomplete__bounceUp", onBounceUpComplete);
-    ball.removeEventListener("animationcomplete__bounceDown", onBounceDownComplete);
-  };
-
-  ball.addEventListener("animationcomplete__bounceUp", onBounceUpComplete);
-  ball.addEventListener("animationcomplete__bounceDown", onBounceDownComplete);
-
-  ball.emit("doBounceUp");
-}
-
-function toggleSpin(ball) {
-  if (!ball) return;
-
-  // Si la animación ya existe, la detenemos y salimos.
-  if (ball.hasAttribute("animation__spin")) {
-    ball.removeAttribute("animation__spin");
-    return;
+  const physics = ball.components['ball-physics'];
+  if (physics) {
+    physics.jump(); 
+    
+    // Si tras tocarlo estimamos que el siguiente fotograma cruzará el límite, bloqueamos preventivamente
+    const pos = ball.object3D.position;
+    if (pos.y + physics.data.jumpStrength >= physics.data.maxHeight && arAnimationBtn) {
+      arAnimationBtn.disabled = true;
+    }
   }
-
-  // Si no existe, la creamos de forma relativa a la posición actual.
-  // 1. Obtenemos la rotación actual en el eje Y (en grados).
-  const currentRotation = ball.object3D.rotation.y * (180 / Math.PI);
-  
-  // 2. Definimos el punto de finalización como la rotación actual + 360 grados.
-  const newRotation = currentRotation + 360;
-
-  // 3. Creamos la animación con 'from' y 'to' para asegurar un ciclo completo.
-  ball.setAttribute(
-    "animation__spin",
-    `property: rotation; from: 0 ${currentRotation} 0; to: 0 ${newRotation} 0; loop: true; dur: 1200; easing: linear`
-  );
 }
 
 function loadTexture(path) {
@@ -559,9 +727,18 @@ if (!scene) {
       ball.setAttribute("rotation", "0 0 0");
       ball.setAttribute("class", "clickable");
 
-      ball.addEventListener("click", (e) => {
-        if (typeof e.stopPropagation === "function") e.stopPropagation();
-        toggleSpin(ball);
+      // Asignamos el nuevo componente para arrastrar y rotar
+      ball.setAttribute('simple-drag-rotator', '');
+      
+      // Asignamos el nuevo componente de físicas (rebote)
+      ball.setAttribute('ball-physics', '');
+      ball.addEventListener('bounce-stopped', () => {
+        if (arAnimationBtn) arAnimationBtn.disabled = false; // Reactiva el botón cuando el balón se detiene por completo
+      });
+      
+      // Apagar el botón si el balón choca contra el techo invisible por inercia
+      ball.addEventListener('max-height-reached', () => {
+        if (arAnimationBtn) arAnimationBtn.disabled = true;
       });
 
       entity.addEventListener("targetFound", async () => {
@@ -580,6 +757,23 @@ if (!scene) {
           window.cargarDatosDesdeBD(country.code).then((datos) => {
             const estadioNombre = datos?.estadio_nombre || "Info no encontrada";
             setStatus(`${country.name.toUpperCase()}: ${estadioNombre} (BD)`);
+
+            // 👉 ACTUALIZAR VIDEO OFICIAL CON LOS DATOS DE DB.JSON
+            if (datos && datos.video_url) {
+              setVideoSource(datos.video_url, `Video oficial — ${datos.nombre}`);
+              
+              // Actualizar también la información del botón en el Acervo (Sidebar)
+              const officialVideoBtn = document.querySelector(".video-item");
+              if (officialVideoBtn) {
+                officialVideoBtn.setAttribute("data-src", datos.video_url);
+                officialVideoBtn.setAttribute("data-title", `Video oficial — ${datos.nombre}`);
+                
+                const metaSub = officialVideoBtn.querySelector(".meta-sub");
+                if (metaSub) {
+                  metaSub.textContent = datos.video_url.split('/').pop(); 
+                }
+              }
+            }
           });
         }
       });
