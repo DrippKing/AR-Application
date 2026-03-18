@@ -46,11 +46,28 @@
 
   <!-- HUD inferior — oculto por defecto -->
   <div id="hud" class="hud hidden" aria-label="Menú AR">
-    <button class="hud-btn" type="button" data-modal="modal-video">🎥 Video Oficial</button>
-    <button class="hud-btn" type="button" data-modal="modal-stats">📊 Estadísticas</button>
-    <button class="hud-btn" type="button" data-modal="modal-estadio">🏟 Información del Estadio</button>
-    <button class="hud-btn" type="button" data-modal="modal-trivia">🎮 Trivia</button>
-    <button class="hud-btn" id="btn-ar-animation" type="button">✨ Activar animación</button>
+    <button class="hud-btn" type="button" data-modal="modal-video" title="Video Oficial">🎥</button>
+    <button class="hud-btn" type="button" data-modal="modal-stats" title="Estadísticas">📊</button>
+    <button class="hud-btn" type="button" data-modal="modal-estadio" title="Información del Estadio">🏟</button>
+    <button class="hud-btn" type="button" data-modal="modal-trivia" title="Trivia">🎮</button>
+    <button class="hud-btn" id="btn-ar-animation" type="button" title="Activar animación">✨</button>
+  </div>
+
+  <!-- Botón de Ajustes de Cámara -->
+  <button id="btn-camera-settings" class="settings-btn hidden" aria-label="Ajustes de cámara">⚙️</button>
+
+  <!-- Selector Manual de Cámaras (Debug) -->
+  <div id="camera-selector" class="camera-selector hidden">
+    <h4>Lentes del Dispositivo</h4>
+    <div id="camera-list"></div>
+    <div id="zoom-container" class="hidden" style="margin-top: 10px; text-align: center;">
+      <h4>Zoom Lógico</h4>
+      <input type="range" id="zoom-slider" min="1" max="5" step="0.1" value="1" style="width: 100%;">
+    </div>
+    <div id="exposure-container" class="hidden" style="margin-top: 10px; text-align: center;">
+      <h4>Exposición</h4>
+      <input type="range" id="exposure-slider" min="-3" max="3" step="0.1" value="0" style="width: 100%;">
+    </div>
   </div>
 
   <!-- Overlay de partículas -->
@@ -277,7 +294,7 @@
         <!-- Acciones -->
         <div class="trivia-actions">
           <button id="trivia-next" class="primary-btn" type="button" disabled>Siguiente</button>
-          <button id="trivia-restart" class="hud-btn" type="button">Jugar de nuevo</button>
+          <button id="trivia-restart" class="secondary-btn" type="button">Jugar de nuevo</button>
         </div>
       </div>
 
@@ -288,7 +305,7 @@
 
         <div class="trivia-actions">
           <button id="trivia-restart-2" class="primary-btn" type="button">Jugar de nuevo</button>
-          <button class="hud-btn" type="button" data-close>Cerrar</button>
+          <button class="secondary-btn" type="button" data-close>Cerrar</button>
         </div>
       </div>
     </div>
@@ -305,7 +322,7 @@
   <!-- AR Scene -->
   <a-scene
     id="ar-scene"
-    mindar-image="imageTargetSrc: ./assets/targets.mind; autoStart: true; uiScanning: yes; uiLoading: yes;"
+    mindar-image="imageTargetSrc: ./assets/targets.mind; autoStart: true; uiScanning: yes; uiLoading: yes; filterMinCF: 0.0001; filterBeta: 0.001; missTolerance: 5;"
     color-space="sRGB"
     renderer="colorManagement: true, physicallyCorrectLights"
     vr-mode-ui="enabled: false"

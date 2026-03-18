@@ -112,15 +112,15 @@ body{
 
   display:flex;
   align-items:center;
-  gap:12px;
+  gap:16px;
 
   /* claves responsive */
-  flex-wrap:wrap;
+  flex-wrap:nowrap;
   max-width:min(96vw, 980px);
   justify-content:center;
 
-  padding:12px 14px;
-  border-radius:20px;
+  padding:10px 20px;
+  border-radius:40px;
   background:rgba(0,0,0,0.55);
   backdrop-filter:blur(12px);
 
@@ -129,8 +129,8 @@ body{
 }
 
 .hud-btn{
-  padding:10px 14px;
-  border-radius:16px;
+  padding:0;
+  border-radius:50%;
   border:1px solid rgba(255,255,255,0.2);
   background:rgba(255,255,255,0.08);
   color:white;
@@ -138,8 +138,12 @@ body{
   transition:.15s ease;
 
   /* accesibilidad/táctil */
-  min-height:44px;
-  min-width:44px;
+  height:50px;
+  width:50px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:24px;
 
   /* evita que el texto reviente */
   white-space:nowrap;
@@ -151,6 +155,81 @@ body{
 
 .hud-btn:active{
   transform:scale(.96);
+}
+
+/* ======================================================
+   BOTÓN DE AJUSTES (CÁMARA)
+   ====================================================== */
+.settings-btn {
+  position: absolute;
+  top: calc(140px + var(--safe-t));
+  left: 15px;
+  z-index: 70;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+.settings-btn:active {
+  transform: scale(0.9);
+}
+
+/* ======================================================
+   SELECTOR DE CÁMARAS MANUAL (DEBUG)
+   ====================================================== */
+.camera-selector {
+  position: absolute;
+  top: calc(195px + var(--safe-t));
+  left: 15px;
+  z-index: 60;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 220px;
+  max-height: 50vh;
+  overflow-y: auto;
+}
+
+.camera-selector h4 {
+  margin: 0;
+  font-size: 11px;
+  text-align: center;
+  color: #08b059;
+  text-transform: uppercase;
+}
+
+#camera-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.camera-btn.active-cam {
+  background: #08b059;
+  border-color: #08b059;
+}
+.camera-btn.reset-cam {
+  margin-top: 5px;
+  background: #c0392b;
+}
+
+#zoom-container h4,
+#exposure-container h4 {
+  margin-bottom: 6px;
+  color: #00b1e8;
 }
 
 /* ======================================================
@@ -433,6 +512,20 @@ body{
   opacity:.85;
 }
 
+.secondary-btn{
+  padding:10px 14px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,0.2);
+  background:rgba(255,255,255,0.08);
+  color:white;
+  cursor:pointer;
+  min-height:44px;
+  transition:.15s ease;
+}
+.secondary-btn:hover{
+  background:rgba(255,255,255,0.18);
+}
+
 /* ======================================================
    RESPONSIVE (AJUSTES FINOS)
    ====================================================== */
@@ -461,6 +554,14 @@ body{
 @media (max-width: 560px){
   body{ overflow:hidden; }
 
+  .settings-btn {
+    top: calc(90px + var(--safe-t));
+  }
+
+  .camera-selector {
+    top: calc(145px + var(--safe-t));
+  }
+
   #tittle-banner{
     top: calc(8px + var(--safe-t));
     width: calc(100% - 16px);
@@ -472,17 +573,20 @@ body{
 
   .hud{
     bottom: calc(12px + var(--safe-b));
-    padding:10px 10px;
-    gap:10px;
-    border-radius:18px;
+    padding:8px 16px;
+    gap:12px;
+    border-radius:40px;
+    flex-wrap:nowrap;
 
     /* si no cabe, permite scroll horizontal como fallback */
     max-width:96vw;
   }
 
   .hud-btn{
-    padding:10px 12px;
-    border-radius:14px;
+    width:44px;
+    height:44px;
+    font-size:20px;
+    border-radius:50%;
   }
 
   .modal-card{

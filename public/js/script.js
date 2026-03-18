@@ -23,10 +23,84 @@ if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
         constraints.video.width = { ideal: 1920 };
         constraints.video.height = { ideal: 1080 };
       }
-      console.log("🔧 Hack Resolución: Forzando 1080p...");
+
+      // 👉 Inyectar el ID del lente seleccionado por el usuario
+      const savedCamId = localStorage.getItem("worldscan_cam_id");
+      if (savedCamId) {
+        constraints.video.deviceId = { exact: savedCamId };
+        console.log("📸 Forzando uso de lente ID:", savedCamId);
+      }
+
+      console.log("� Hack Resolución: Forzando 1080p...");
     }
-    return originalGUM(constraints);
+    
+    // Atrapamos la promesa original sin romperla
+    return originalGUM(constraints).then(stream => {
+      // Guardamos la pista de video para aplicarle controles avanzados
+      window.currentVideoTrack = stream.getVideoTracks()[0];
+      setTimeout(setupCameraControls, 1000); // Esperar a que la cámara inicie
+      return stream;
+    });
   };
+}
+
+// Función para controlar zoom y exposición
+function setupCameraControls() {
+  const track = window.currentVideoTrack;
+  if (!track) return;
+
+  try {
+    const capabilities = track.getCapabilities();
+    const settings = track.getSettings();
+    
+    // --- ZOOM LOGICO ---
+    const zoomContainer = document.getElementById("zoom-container");
+    const zoomSlider = document.getElementById("zoom-slider");
+
+    if (capabilities.zoom && zoomContainer && zoomSlider) {
+      zoomContainer.classList.remove("hidden");
+      
+      zoomSlider.min = capabilities.zoom.min;
+      zoomSlider.max = capabilities.zoom.max;
+      zoomSlider.step = capabilities.zoom.step || 0.1;
+      zoomSlider.value = settings.zoom || 1;
+
+      zoomSlider.addEventListener("input", async (e) => {
+        await track.applyConstraints({
+          advanced: [{ zoom: parseFloat(e.target.value) }]
+        }).catch(err => console.warn("Error aplicando zoom:", err));
+      });
+    }
+
+    // --- EXPOSICIÓN ---
+    const expContainer = document.getElementById("exposure-container");
+    const expSlider = document.getElementById("exposure-slider");
+
+    // Verificamos si el navegador expone la compensación de exposición
+    if (capabilities.exposureCompensation && expContainer && expSlider) {
+      expContainer.classList.remove("hidden");
+      
+      const minExposure = capabilities.exposureCompensation.min;
+
+      expSlider.min = minExposure;
+      expSlider.max = capabilities.exposureCompensation.max;
+      expSlider.step = capabilities.exposureCompensation.step || 0.1;
+      
+      // Forzar al mínimo al arrancar para no quemar imágenes de pantallas
+      expSlider.value = minExposure;
+      track.applyConstraints({
+        advanced: [{ exposureCompensation: minExposure }]
+      }).catch(err => console.warn("Error aplicando exposición inicial:", err));
+
+      expSlider.addEventListener("input", async (e) => {
+        await track.applyConstraints({
+          advanced: [{ exposureCompensation: parseFloat(e.target.value) }]
+        }).catch(err => console.warn("Error aplicando exposición:", err));
+      });
+    }
+  } catch (e) {
+    console.warn("No se pudieron leer las capacidades de la cámara:", e);
+  }
 }
 
 // =====================================================
@@ -359,16 +433,16 @@ function triggerBounce(ball) {
 
   stopBounce(ball);
 
-  ball.setAttribute("position", "0 0.25 0.15");
+  ball.setAttribute("position", "0 0 0");
 
   ball.setAttribute(
     "animation__bounceUp",
-    "property: position; from: 0 0.25 0.15; to: 0 0.48 0.15; dur: 320; easing: easeOutQuad; startEvents: doBounceUp"
+    "property: position; from: 0 0 0; to: 0 0.3 0; dur: 320; easing: easeOutQuad; startEvents: doBounceUp"
   );
 
   ball.setAttribute(
     "animation__bounceDown",
-    "property: position; from: 0 0.48 0.15; to: 0 0.25 0.15; dur: 380; easing: easeInQuad; startEvents: doBounceDown"
+    "property: position; from: 0 0.3 0; to: 0 0 0; dur: 380; easing: easeInQuad; startEvents: doBounceDown"
   );
 
   const onBounceUpComplete = () => {
@@ -389,14 +463,23 @@ function triggerBounce(ball) {
 function toggleSpin(ball) {
   if (!ball) return;
 
+  // Si la animación ya existe, la detenemos y salimos.
   if (ball.hasAttribute("animation__spin")) {
     ball.removeAttribute("animation__spin");
     return;
   }
 
+  // Si no existe, la creamos de forma relativa a la posición actual.
+  // 1. Obtenemos la rotación actual en el eje Y (en grados).
+  const currentRotation = ball.object3D.rotation.y * (180 / Math.PI);
+  
+  // 2. Definimos el punto de finalización como la rotación actual + 360 grados.
+  const newRotation = currentRotation + 360;
+
+  // 3. Creamos la animación con 'from' y 'to' para asegurar un ciclo completo.
   ball.setAttribute(
     "animation__spin",
-    "property: rotation; to: 0 360 0; loop: true; dur: 1200; easing: linear"
+    `property: rotation; from: 0 ${currentRotation} 0; to: 0 ${newRotation} 0; loop: true; dur: 1200; easing: linear`
   );
 }
 
@@ -469,23 +552,9 @@ if (!scene) {
       const entity = document.createElement("a-entity");
       entity.setAttribute("mindar-image-target", `targetIndex: ${index}`);
 
-      const plane = document.createElement("a-plane");
-      plane.setAttribute("class", "clickable");
-      plane.setAttribute("color", country.color);
-      plane.setAttribute("opacity", "0.6");
-      plane.setAttribute("height", "0.55");
-      plane.setAttribute("width", "1");
-
-      const text = document.createElement("a-text");
-      text.setAttribute("value", country.name.toUpperCase());
-      text.setAttribute("align", "center");
-      text.setAttribute("position", "0 -0.45 0.1");
-      text.setAttribute("color", "#FFFFFF");
-      text.setAttribute("width", "2");
-
       const ball = document.createElement("a-entity");
       ball.setAttribute("gltf-model", "#soccerBallGLB");
-      ball.setAttribute("position", "0 0.25 0.15");
+      ball.setAttribute("position", "0 0 0");
       ball.setAttribute("scale", "0.35 0.35 0.35");
       ball.setAttribute("rotation", "0 0 0");
       ball.setAttribute("class", "clickable");
@@ -533,17 +602,74 @@ if (!scene) {
         }
       });
 
-      plane.addEventListener("click", () => {
-        window.open(
-          `https://www.google.com/search?q=seleccion+${country.id}+mundial+2026`,
-          "_blank"
-        );
-      });
-
-      entity.appendChild(plane);
-      entity.appendChild(text);
       entity.appendChild(ball);
       scene.appendChild(entity);
     });
   });
 }
+
+// =====================================================
+// DETECCIÓN Y SELECTOR DE MÚLTIPLES LENTES (CÁMARAS)
+// =====================================================
+async function loadCameraSelector() {
+  if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) {
+    console.warn("La API enumerateDevices no está soportada.");
+    return;
+  }
+
+  try {
+    // Leemos todos los dispositivos de hardware
+    const devices = await navigator.mediaDevices.enumerateDevices();
+    
+    // Filtramos SOLO los lentes traseros (ignoramos "front", "frontal" o "user")
+    const videoDevices = devices.filter(d => {
+      if (d.kind !== "videoinput") return false;
+      const label = d.label.toLowerCase();
+      return !label.includes("front") && !label.includes("frontal") && !label.includes("user");
+    });
+    
+    const selectorEl = document.getElementById("camera-selector");
+    const listEl = document.getElementById("camera-list");
+    const currentCamId = localStorage.getItem("worldscan_cam_id");
+
+    if (videoDevices.length > 0 && selectorEl && listEl) {
+      listEl.innerHTML = ""; // Limpiar
+
+      videoDevices.forEach((cam, index) => {
+        const btn = document.createElement("button");
+        btn.className = "secondary-btn camera-btn"; // Usamos la clase correcta para botones de texto
+
+        // Si el lente tiene un nombre real se lo ponemos, si no le damos un genérico
+        let camName = cam.label || `Lente ${index + 1}`;
+        btn.textContent = camName;
+
+        // Resaltar en verde la cámara que esté seleccionada
+        if (currentCamId === cam.deviceId) {
+          btn.classList.add("active-cam");
+          btn.textContent = `✅ ${camName}`;
+        }
+
+        // Al hacer clic, guardar el lente y recargar la página para que MindAR lo tome
+        btn.addEventListener("click", () => {
+          localStorage.setItem("worldscan_cam_id", cam.deviceId);
+          window.location.reload(); 
+        });
+
+        listEl.appendChild(btn);
+      });
+
+      // Mostrar botón de ajustes y agregar evento de abrir/cerrar
+      const settingsBtn = document.getElementById("btn-camera-settings");
+      if (settingsBtn) {
+        settingsBtn.classList.remove("hidden");
+        settingsBtn.onclick = () => selectorEl.classList.toggle("hidden");
+      }
+    }
+  } catch (err) {
+    console.error("❌ Error al obtener las cámaras:", err);
+  }
+}
+
+// Esperamos 2 segundos para dar tiempo a que el navegador pida permiso de cámara,
+// así los nombres de los lentes no salen vacíos.
+setTimeout(loadCameraSelector, 2000);
