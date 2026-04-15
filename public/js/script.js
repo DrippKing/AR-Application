@@ -451,10 +451,21 @@ if (hud) {
 
     openModalById(modalId);
 
+    // ✅ TRIVIA
     if (modalId === "modal-trivia") {
       const countryId = currentCountry ? currentCountry.id : null;
+
       if (window.Trivia && typeof window.Trivia.start === "function") {
         window.Trivia.start(countryId);
+      }
+    }
+
+    // ✅ ESTADÍSTICAS (AGREGAR ESTO AQUÍ)
+    if (modalId === "modal-stats") {
+      const countryId = currentCountry ? currentCountry.id : null;
+
+      if (window.Stats && typeof window.Stats.render === "function") {
+        window.Stats.render(countryId);
       }
     }
   });

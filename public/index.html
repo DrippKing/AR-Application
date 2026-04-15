@@ -204,13 +204,24 @@
 
   <!-- Otros modales -->
   <div id="modal-stats" class="modal hidden" aria-hidden="true">
-    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="stats-title">
-      <button class="modal-close" type="button" data-close aria-label="Cerrar">✕</button>
-      <h2 id="stats-title">📊 Estadísticas</h2>
-      <p>Avance visual: tarjetas con datos (grupo, ranking, partidos, goles) y barra de posesión.</p>
-      <div class="modal-note">*Por ahora es maqueta visual.*</div>
+  <div class="modal-card stats-modal" role="dialog" aria-modal="true" aria-labelledby="stats-title">
+    <button class="modal-close" type="button" data-close aria-label="Cerrar">✕</button>
+
+    <h2 id="stats-title">📊 Estadísticas</h2>
+
+    <div id="stats-content" class="stats-content">
+      <!-- Aquí stats.js renderiza dinámicamente:
+           - jugadores destacados
+           - estadio emblemático
+           - copas del mundo -->
+    </div>
+
+    <div class="video-footer">
+      <small>Estadísticas dinámicas por país detectado.</small>
+      <button class="primary-btn" type="button" data-close>Cerrar</button>
     </div>
   </div>
+</div>
 
   <div id="modal-estadio" class="modal hidden" aria-hidden="true">
     <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="estadio-title">
@@ -323,8 +334,10 @@
   </a-scene>
 
  <script src="./js/db-service.js"></script>
- <script src="./js/triviaData.js"></script>
+<script src="./js/triviaData.js"></script>
 <script src="./js/trivia.js"></script>
+<script src="./js/statsData.js"></script>
+<script src="./js/stats.js"></script>
 <script src="./js/script.js"></script>
 
 </body>

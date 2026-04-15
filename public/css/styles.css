@@ -869,3 +869,414 @@ body{
     justify-content:space-between;
   }
 }
+/* ======================================================
+   ESTADÍSTICAS — MODAL DINÁMICO
+   Pegar al final de styles.css
+   ====================================================== */
+
+.stats-content{
+  display:flex;
+  flex-direction:column;
+  gap:18px;
+  margin-top:14px;
+}
+
+.stats-head{
+  padding:16px;
+  border-radius:18px;
+  background:
+    linear-gradient(135deg, rgba(8,176,89,0.16), rgba(0,177,232,0.12) 55%, rgba(32,55,113,0.16));
+  border:1px solid rgba(255,255,255,0.14);
+  box-shadow:0 12px 30px rgba(0,0,0,0.18);
+}
+
+.stats-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:6px 12px;
+  border-radius:999px;
+  background:rgba(255,255,255,0.10);
+  border:1px solid rgba(255,255,255,0.14);
+  color:#dff8ea;
+  font-size:12px;
+  font-weight:700;
+  letter-spacing:.3px;
+  margin-bottom:12px;
+}
+
+.stats-country-title{
+  margin:0 0 6px 0;
+  font-size:clamp(22px, 4vw, 30px);
+  line-height:1.05;
+  color:#fff;
+}
+
+.stats-country-sub{
+  margin:0;
+  color:rgba(255,255,255,0.80);
+  font-size:14px;
+  line-height:1.45;
+}
+
+.stats-section{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+.stats-section-head{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+}
+
+.stats-section-title{
+  margin:0;
+  font-size:18px;
+  color:#fff;
+}
+
+.stats-section-sub{
+  margin:0;
+  font-size:13px;
+  color:rgba(255,255,255,0.68);
+  line-height:1.4;
+}
+
+.stats-grid{
+  display:grid;
+  gap:14px;
+}
+
+.players-grid{
+  grid-template-columns:repeat(3, minmax(0, 1fr));
+}
+
+.stadium-grid,
+.cups-grid{
+  grid-template-columns:1fr;
+}
+
+.stats-card{
+  position:relative;
+  border-radius:18px;
+  padding:16px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.085), rgba(255,255,255,0.045));
+  border:1px solid rgba(255,255,255,0.14);
+  box-shadow:0 16px 34px rgba(0,0,0,0.22);
+  overflow:hidden;
+}
+
+.stats-card::before{
+  content:"";
+  position:absolute;
+  inset:0 0 auto 0;
+  height:3px;
+  background:linear-gradient(90deg, #08b059, #00b1e8, #203771);
+  opacity:.95;
+}
+
+.stats-card-top{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:12px;
+}
+
+.stats-chip{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:6px 10px;
+  border-radius:999px;
+  background:rgba(255,255,255,0.08);
+  border:1px solid rgba(255,255,255,0.12);
+  color:#dcefff;
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:.35px;
+  text-transform:uppercase;
+}
+
+/* PLAYER CARDS */
+
+.player-card{
+  min-height:220px;
+  display:flex;
+  flex-direction:column;
+}
+
+.stats-player-name{
+  margin:0 0 6px 0;
+  font-size:20px;
+  line-height:1.1;
+  color:#fff;
+}
+
+.stats-player-role{
+  font-size:13px;
+  font-weight:700;
+  color:#7be0b0;
+  margin-bottom:4px;
+}
+
+.stats-player-club{
+  font-size:13px;
+  color:#8fd8ff;
+  margin-bottom:10px;
+}
+
+.stats-player-note{
+  margin:0;
+  color:rgba(255,255,255,0.76);
+  font-size:13px;
+  line-height:1.45;
+}
+
+/* STADIUM CARD */
+
+.stadium-card{
+  padding:18px;
+}
+
+.stats-stadium-name{
+  margin:0 0 10px 0;
+  font-size:24px;
+  line-height:1.1;
+  color:#fff;
+}
+
+.stats-stadium-meta{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-bottom:12px;
+}
+
+.stats-stadium-meta span{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:8px 12px;
+  border-radius:999px;
+  background:rgba(255,255,255,0.08);
+  border:1px solid rgba(255,255,255,0.12);
+  color:rgba(255,255,255,0.88);
+  font-size:12px;
+  font-weight:600;
+}
+
+.stats-stadium-note{
+  margin:0;
+  font-size:14px;
+  color:rgba(255,255,255,0.80);
+  line-height:1.5;
+}
+
+/* CUPS CARD */
+
+.cups-card{
+  text-align:center;
+  padding:22px 18px;
+  background:
+    radial-gradient(circle at top, rgba(0,177,232,0.12), transparent 42%),
+    linear-gradient(180deg, rgba(255,255,255,0.085), rgba(255,255,255,0.045));
+}
+
+.stats-cups-number{
+  font-size:clamp(46px, 10vw, 74px);
+  line-height:1;
+  font-weight:800;
+  letter-spacing:-1px;
+  margin-top:4px;
+  color:#fff;
+  text-shadow:0 0 22px rgba(0,177,232,0.22);
+}
+
+.stats-cups-label{
+  margin-top:6px;
+  font-size:14px;
+  font-weight:700;
+  color:#d8f7ff;
+  text-transform:uppercase;
+  letter-spacing:.6px;
+}
+
+.stats-cups-visual{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-top:16px;
+  min-height:34px;
+}
+
+.stats-cup-icon{
+  font-size:24px;
+  filter:grayscale(1);
+  opacity:.28;
+  transform:translateY(0);
+}
+
+.stats-cup-icon.is-earned{
+  filter:none;
+  opacity:1;
+  text-shadow:0 0 14px rgba(255,208,0,0.20);
+}
+
+.stats-cups-note{
+  margin:16px 0 0 0;
+  font-size:14px;
+  line-height:1.45;
+  color:rgba(255,255,255,0.78);
+}
+
+/* EMPTY STATES */
+
+.stats-empty,
+.stats-empty-inline{
+  border-radius:18px;
+  border:1px dashed rgba(255,255,255,0.16);
+  background:rgba(255,255,255,0.04);
+  color:rgba(255,255,255,0.72);
+}
+
+.stats-empty{
+  padding:24px 16px;
+  text-align:center;
+}
+
+.stats-empty-icon{
+  font-size:34px;
+  margin-bottom:8px;
+}
+
+.stats-empty-title{
+  margin:0 0 8px 0;
+  font-size:18px;
+  color:#fff;
+}
+
+.stats-empty-text{
+  margin:0;
+  font-size:14px;
+  line-height:1.45;
+}
+
+.stats-empty-inline{
+  padding:16px;
+  font-size:14px;
+  text-align:center;
+}
+
+/* ======================================================
+   RESPONSIVE
+   ====================================================== */
+
+@media (max-width: 900px){
+  .players-grid{
+    grid-template-columns:repeat(2, minmax(0, 1fr));
+  }
+
+  .stats-stadium-name{
+    font-size:22px;
+  }
+}
+
+@media (max-width: 640px){
+  .stats-content{
+    gap:16px;
+    margin-top:12px;
+  }
+
+  .stats-head,
+  .stats-card{
+    border-radius:16px;
+  }
+
+  .stats-head{
+    padding:14px;
+  }
+
+  .stats-country-title{
+    font-size:24px;
+  }
+
+  .stats-country-sub{
+    font-size:13px;
+  }
+
+  .stats-section-title{
+    font-size:17px;
+  }
+
+  .players-grid{
+    grid-template-columns:1fr;
+  }
+
+  .player-card{
+    min-height:auto;
+  }
+
+  .stats-player-name{
+    font-size:18px;
+  }
+
+  .stats-stadium-name{
+    font-size:20px;
+  }
+
+  .stats-stadium-meta{
+    flex-direction:column;
+    align-items:stretch;
+  }
+
+  .stats-stadium-meta span{
+    justify-content:flex-start;
+    width:100%;
+  }
+
+  .stats-cups-number{
+    font-size:54px;
+  }
+
+  .stats-cups-visual{
+    gap:8px;
+  }
+
+  .stats-cup-icon{
+    font-size:22px;
+  }
+}
+
+@media (max-width: 420px){
+  .stats-head,
+  .stats-card{
+    padding:14px;
+  }
+
+  .stats-badge{
+    font-size:11px;
+    padding:5px 10px;
+  }
+
+  .stats-country-title{
+    font-size:22px;
+  }
+
+  .stats-section-sub,
+  .stats-player-note,
+  .stats-stadium-note,
+  .stats-cups-note,
+  .stats-empty-text{
+    font-size:13px;
+  }
+
+  .stats-cups-number{
+    font-size:48px;
+  }
+}
