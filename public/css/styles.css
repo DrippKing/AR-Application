@@ -1280,3 +1280,363 @@ body{
     font-size:48px;
   }
 }
+
+/* ======================================================
+   ESTADIO — MODAL DINÁMICO
+  
+   ====================================================== */
+
+.stadium-content{
+  display:flex;
+  flex-direction:column;
+  gap:18px;
+  margin-top:14px;
+}
+
+.stadium-head{
+  padding:18px;
+  border-radius:18px;
+  background:
+    linear-gradient(135deg, rgba(32,55,113,0.18), rgba(0,177,232,0.12) 52%, rgba(8,176,89,0.14));
+  border:1px solid rgba(255,255,255,0.14);
+  box-shadow:0 12px 30px rgba(0,0,0,0.18);
+}
+
+.stadium-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:6px 12px;
+  border-radius:999px;
+  background:rgba(255,255,255,0.10);
+  border:1px solid rgba(255,255,255,0.14);
+  color:#e2f4ff;
+  font-size:12px;
+  font-weight:700;
+  letter-spacing:.3px;
+  margin-bottom:12px;
+}
+
+.stadium-main-title{
+  margin:0 0 6px 0;
+  font-size:clamp(22px, 4vw, 30px);
+  line-height:1.05;
+  color:#fff;
+}
+
+.stadium-main-sub{
+  margin:0 0 10px 0;
+  color:#9fe7ff;
+  font-size:14px;
+  font-weight:700;
+  letter-spacing:.2px;
+}
+
+.stadium-main-note{
+  margin:0;
+  color:rgba(255,255,255,0.80);
+  font-size:14px;
+  line-height:1.5;
+}
+
+.stadium-info-grid{
+  display:grid;
+  grid-template-columns:repeat(2, minmax(0, 1fr));
+  gap:14px;
+}
+
+.stadium-mini-card{
+  position:relative;
+  padding:16px;
+  border-radius:18px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.085), rgba(255,255,255,0.045));
+  border:1px solid rgba(255,255,255,0.14);
+  box-shadow:0 14px 30px rgba(0,0,0,0.20);
+  overflow:hidden;
+}
+
+.stadium-mini-card::before{
+  content:"";
+  position:absolute;
+  inset:0 0 auto 0;
+  height:3px;
+  background:linear-gradient(90deg, #08b059, #00b1e8, #203771);
+  opacity:.95;
+}
+
+.stadium-mini-card.accent-blue::before{
+  background:linear-gradient(90deg, #203771, #00b1e8);
+}
+
+.stadium-mini-card.accent-cyan::before{
+  background:linear-gradient(90deg, #00b1e8, #7bddff);
+}
+
+.stadium-mini-card.accent-green::before{
+  background:linear-gradient(90deg, #08b059, #6df2a7);
+}
+
+.stadium-mini-label{
+  display:block;
+  margin-bottom:8px;
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:.45px;
+  text-transform:uppercase;
+  color:rgba(255,255,255,0.64);
+}
+
+.stadium-mini-value{
+  display:block;
+  color:#fff;
+  font-size:16px;
+  line-height:1.35;
+  font-weight:700;
+}
+
+.stadium-section{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+.stadium-section-head{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+}
+
+.stadium-section-title{
+  margin:0;
+  font-size:18px;
+  color:#fff;
+}
+
+.stadium-section-sub{
+  margin:0;
+  font-size:13px;
+  color:rgba(255,255,255,0.68);
+  line-height:1.4;
+}
+
+.stadium-profile-card,
+.stadium-history-card,
+.stadium-highlight-card{
+  position:relative;
+  border-radius:18px;
+  padding:18px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.085), rgba(255,255,255,0.045));
+  border:1px solid rgba(255,255,255,0.14);
+  box-shadow:0 16px 34px rgba(0,0,0,0.22);
+  overflow:hidden;
+}
+
+.stadium-profile-card::before,
+.stadium-history-card::before,
+.stadium-highlight-card::before{
+  content:"";
+  position:absolute;
+  inset:0 0 auto 0;
+  height:3px;
+  background:linear-gradient(90deg, #08b059, #00b1e8, #203771);
+}
+
+.stadium-profile-card{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+.stadium-profile-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:16px;
+  padding-bottom:12px;
+  border-bottom:1px solid rgba(255,255,255,0.08);
+}
+
+.stadium-profile-row:last-child{
+  padding-bottom:0;
+  border-bottom:none;
+}
+
+.stadium-profile-label{
+  min-width:110px;
+  font-size:12px;
+  font-weight:700;
+  letter-spacing:.3px;
+  text-transform:uppercase;
+  color:rgba(255,255,255,0.62);
+}
+
+.stadium-profile-value{
+  flex:1;
+  text-align:right;
+  font-size:14px;
+  color:#fff;
+  line-height:1.45;
+  font-weight:600;
+}
+
+.stadium-history-text{
+  margin:0;
+  font-size:14px;
+  line-height:1.65;
+  color:rgba(255,255,255,0.82);
+}
+
+.stadium-highlight-card{
+  display:flex;
+  align-items:flex-start;
+  gap:14px;
+  background:
+    radial-gradient(circle at top left, rgba(0,177,232,0.10), transparent 35%),
+    linear-gradient(180deg, rgba(255,255,255,0.085), rgba(255,255,255,0.045));
+}
+
+.stadium-highlight-icon{
+  width:48px;
+  height:48px;
+  display:grid;
+  place-items:center;
+  border-radius:14px;
+  flex-shrink:0;
+  font-size:20px;
+  background:linear-gradient(135deg, rgba(8,176,89,0.18), rgba(0,177,232,0.18));
+  border:1px solid rgba(255,255,255,0.12);
+}
+
+.stadium-highlight-text{
+  margin:0;
+  font-size:14px;
+  line-height:1.6;
+  color:rgba(255,255,255,0.82);
+}
+
+/* EMPTY STATE */
+
+.stadium-empty{
+  padding:24px 16px;
+  text-align:center;
+  border-radius:18px;
+  border:1px dashed rgba(255,255,255,0.16);
+  background:rgba(255,255,255,0.04);
+}
+
+.stadium-empty-icon{
+  font-size:34px;
+  margin-bottom:8px;
+}
+
+.stadium-empty-title{
+  margin:0 0 8px 0;
+  font-size:18px;
+  color:#fff;
+}
+
+.stadium-empty-text{
+  margin:0;
+  font-size:14px;
+  line-height:1.45;
+  color:rgba(255,255,255,0.74);
+}
+
+/* ======================================================
+   RESPONSIVE
+   ====================================================== */
+
+@media (max-width: 900px){
+  .stadium-main-title{
+    font-size:26px;
+  }
+}
+
+@media (max-width: 640px){
+  .stadium-content{
+    gap:16px;
+    margin-top:12px;
+  }
+
+  .stadium-head,
+  .stadium-mini-card,
+  .stadium-profile-card,
+  .stadium-history-card,
+  .stadium-highlight-card,
+  .stadium-empty{
+    border-radius:16px;
+  }
+
+  .stadium-head,
+  .stadium-profile-card,
+  .stadium-history-card,
+  .stadium-highlight-card{
+    padding:16px;
+  }
+
+  .stadium-info-grid{
+    grid-template-columns:1fr;
+  }
+
+  .stadium-main-title{
+    font-size:22px;
+  }
+
+  .stadium-main-sub,
+  .stadium-main-note,
+  .stadium-history-text,
+  .stadium-highlight-text,
+  .stadium-empty-text{
+    font-size:13px;
+  }
+
+  .stadium-profile-row{
+    flex-direction:column;
+    gap:6px;
+  }
+
+  .stadium-profile-label{
+    min-width:auto;
+  }
+
+  .stadium-profile-value{
+    text-align:left;
+    font-size:13px;
+  }
+
+  .stadium-highlight-card{
+    flex-direction:column;
+  }
+}
+
+@media (max-width: 420px){
+  .stadium-head,
+  .stadium-profile-card,
+  .stadium-history-card,
+  .stadium-highlight-card{
+    padding:14px;
+  }
+
+  .stadium-mini-card{
+    padding:14px;
+  }
+
+  .stadium-badge{
+    font-size:11px;
+    padding:5px 10px;
+  }
+
+  .stadium-main-title{
+    font-size:20px;
+  }
+
+  .stadium-section-title{
+    font-size:17px;
+  }
+
+  .stadium-mini-value{
+    font-size:15px;
+  }
+}

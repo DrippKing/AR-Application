@@ -224,13 +224,21 @@
 </div>
 
   <div id="modal-estadio" class="modal hidden" aria-hidden="true">
-    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="estadio-title">
-      <button class="modal-close" type="button" data-close aria-label="Cerrar">✕</button>
-      <h2 id="estadio-title">🏟 Información del Estadio</h2>
-      <p>Avance visual: aquí se mostrará sede, ciudad, capacidad y detalles del partido.</p>
-      <div class="modal-note">*Por ahora es maqueta visual.*</div>
+  <div class="modal-card stadium-modal" role="dialog" aria-modal="true" aria-labelledby="estadio-title">
+    <button class="modal-close" type="button" data-close aria-label="Cerrar">✕</button>
+
+    <h2 id="estadio-title">🏟 Información del Estadio</h2>
+
+    <div id="stadium-content" class="stadium-content">
+      <!-- stadium.js renderiza aquí -->
+    </div>
+
+    <div class="video-footer">
+     
+      <button class="primary-btn" type="button" data-close>Cerrar</button>
     </div>
   </div>
+</div>
 
   <div id="modal-trivia" class="modal hidden" aria-hidden="true">
   <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="trivia-title">
@@ -338,6 +346,8 @@
 <script src="./js/trivia.js"></script>
 <script src="./js/statsData.js"></script>
 <script src="./js/stats.js"></script>
+<script src="./js/stadiumData.js"></script>
+<script src="./js/stadium.js"></script>
 <script src="./js/script.js"></script>
 
 </body>

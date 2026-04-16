@@ -468,6 +468,15 @@ if (hud) {
         window.Stats.render(countryId);
       }
     }
+
+    // estadio
+     if (modalId === "modal-estadio") {
+     const countryId = currentCountry ? currentCountry.id : null;
+
+      if (window.Stadium && typeof window.Stadium.render === "function") {
+      window.Stadium.render(countryId);
+      }
+     }
   });
 }
 
