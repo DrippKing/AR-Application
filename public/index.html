@@ -3,342 +3,182 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Escáner AR — Mundial 2026</title>
+  <title>WorldScan 2026 — Inicio</title>
 
-  <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
-  <script src="https://unpkg.com/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
-
-  <link rel="stylesheet" href="./css/styles.css" />
-
-  <style>
-  body { margin: 0; overflow: hidden; background-color:#181A18; }
-
-  #fx-stars{
-    position: fixed;
-    inset: 0;
-    width: 100vw;
-    height: 100vh;
-    object-fit: cover;
-    pointer-events: none;
-    opacity: 0;
-    z-index: 9999;
-    transition: opacity .25s ease;
-  }
-
-  #fx-stars.show{
-    opacity: .95;
-  }
-</style>
+  <link rel="stylesheet" href="./css/landing.css" />
 </head>
-
 <body>
 
-  <!-- Filtro SVG para efecto Pixelado Real -->
-  <svg style="position: absolute; width: 0; height: 0;" aria-hidden="true">
-    <defs>
-      <filter id="pixelate-effect">
-        <feFlood x="4" y="4" height="2" width="2"/>
-        <feComposite width="10" height="10"/>
-        <feTile result="a"/>
-        <feComposite in="SourceGraphic" in2="a" operator="in"/>
-        <feMorphology operator="dilate" radius="5"/>
-      </filter>
-    </defs>
-  </svg>
+  <div class="bg-orb orb-1"></div>
+  <div class="bg-orb orb-2"></div>
+  <div class="bg-grid"></div>
 
-  <!-- Banner superior -->
-  <div id="tittle-banner">
-    <div id="logo">
-      <img src="./assets/trionda_ball.png" alt="Logo Mundial 2026" width="36" height="36" />
-      <div class="banner-text">
-        <h1>WorldScan</h1>
-        <h3>2026</h3>
+  <header class="topbar">
+    <div class="brand">
+      <img src="./assets/trionda_ball.png" alt="Balón WorldScan 2026" class="brand-ball" />
+      <div class="brand-text">
+        <span class="brand-title">WorldScan</span>
+        <span class="brand-year">2026</span>
       </div>
     </div>
-  </div>
 
-  <!-- HUD inferior — oculto por defecto -->
-  <div id="hud" class="hud hidden" aria-label="Menú AR">
-    <button class="hud-btn" type="button" data-modal="modal-video" title="Video Oficial">🎥</button>
-    <button class="hud-btn" type="button" data-modal="modal-stats" title="Estadísticas">📊</button>
-    <button class="hud-btn" type="button" data-modal="modal-estadio" title="Información del Estadio">🏟</button>
-    <button class="hud-btn" type="button" data-modal="modal-trivia" title="Trivia">🎮</button>
-    <button class="hud-btn" id="btn-ar-animation" type="button" title="Activar animación">✨</button>
-  </div>
+    <a href="./scanner.html" class="topbar-btn">Ir al escáner</a>
+  </header>
 
-  <!-- Botón de Ajustes de Cámara -->
-  <button id="btn-camera-settings" class="settings-btn hidden" aria-label="Ajustes de cámara">⚙️</button>
+  <main class="hero">
+    <section class="hero-copy">
+      <div class="eyebrow">PIA · Procesamiento de Imágenes · WebAR</div>
 
-  <!-- Selector Manual de Cámaras (Debug) -->
-  <div id="camera-selector" class="camera-selector hidden">
-    <h4>Lentes del Dispositivo</h4>
-    <div id="camera-list"></div>
-    <div id="zoom-container" class="hidden" style="margin-top: 10px; text-align: center;">
-      <h4>Zoom Lógico</h4>
-      <input type="range" id="zoom-slider" min="1" max="5" step="0.1" value="1" style="width: 100%;">
-    </div>
-    <div id="exposure-container" class="hidden" style="margin-top: 10px; text-align: center;">
-      <h4>Exposición</h4>
-      <input type="range" id="exposure-slider" min="-3" max="3" step="0.1" value="0" style="width: 100%;">
-    </div>
-  </div>
+      <h1 class="hero-title">
+        Escanea banderas del mundo y
+        <span>activa una experiencia AR futbolera</span>
+      </h1>
 
-  <!-- Overlay de partículas -->
-  <img id="fx-stars" src="./assets/img/estrellas.gif" alt="" aria-hidden="true" />
+      <p class="hero-text">
+        WorldScan 2026 es una experiencia interactiva que te prepara para el Mundial 2026.
+        Detecta banderas, activa contenido en realidad aumentada, explora estadísticas,
+        estadio, trivia y contenido multimedia desde cualquier dispositivo con camara.
+      </p>
 
-  <!-- =========================================================
-       MODAL: VIDEO + FILTROS (FE)
-       - Acervo de videos (playlist visual)
-       - Filtros permitidos (sin B/N, grises, sepia, exposición, invertido)
-       ========================================================= -->
-  <div id="modal-video" class="modal hidden" aria-hidden="true">
-    <div class="modal-card video-editor" role="dialog" aria-modal="true" aria-labelledby="video-title">
-      <button class="modal-close" type="button" data-close aria-label="Cerrar">✕</button>
-
-      <!-- Header -->
-      <div class="video-head">
-        <div class="video-badge">🎥 Video + Filtros (FE)</div>
-        <h2 id="video-title" class="video-title">Video oficial — País detectado</h2>
-        <p class="video-sub">
-          Selecciona un video del acervo y aplica filtros permitidos.
-        </p>
+      <div class="hero-actions">
+        <a href="./scanner.html" class="btn btn-primary">Activar escáner</a>
+        <a href="#info" class="btn btn-secondary">Ver cómo funciona</a>
       </div>
 
-      <!-- Layout editor: Player + Sidebar -->
-      <div class="editor-grid">
-
-        <!-- Player -->
-        <div class="player-shell" aria-label="Reproductor de video">
-          <div class="player-top">
-            <span class="player-dot"></span>
-            <span class="player-dot"></span>
-            <span class="player-dot"></span>
-            <span class="player-label">WORLD CUP 2026 • PREVIEW</span>
-          </div>
-
-          <!-- ✅ VIDEO REAL -->
-          <video
-            id="video-preview"
-            class="video-preview"
-            preload="metadata"
-            playsinline
-            controls
-            src="./assets/movies/Germany v Mexico  2018 FIFA World Cup  Match Highlights.mp4"
-          ></video>
-
-          <!-- Overlay tipo marcador (futbolero) -->
-          <div class="scoreboard" aria-hidden="true">
-            <div class="sb-left">WS</div>
-            <div class="sb-mid">LIVE</div>
-            <div class="sb-right">2026</div>
-          </div>
-
-          <!-- Overlay FX (pixel/thermal/custom) -->
-          <div id="fx-overlay" class="fx-overlay" aria-hidden="true"></div>
-        </div>
-
-        <!-- Sidebar: Acervo -->
-        <aside class="video-side" aria-label="Acervo de videos">
-          <div class="side-title">Acervo (Mundial 2026)</div>
-
-          <div class="video-list">
-
-            <!-- Item real -->
-            <button class="video-item active" type="button"
-                    data-src="./assets/movies/Germany v Mexico  2018 FIFA World Cup  Match Highlights.mp4"
-                    data-title="Video oficial — Highlights">
-              <div class="thumb">
-                <span class="thumb-tag">OFICIAL</span>
-                <span class="thumb-play">▶</span>
-              </div>
-              <div class="meta">
-                <div class="meta-title">Highlights — Oficial</div>
-                <div class="meta-sub">Germany v Mexico...</div>
-              </div>
-            </button>
-
-          </div>
-        </aside>
-
-      </div>
-
-      <!-- Filtros (permitidos) -->
-      <div class="filters">
-        <div class="filters-title">Filtros permitidos (FE)</div>
-
-        <div class="filters-grid">
-          <button class="filter-chip" type="button" data-filter="blur" aria-pressed="false">
-            <span class="chip-ic">🔵</span>
-            <span class="chip-txt">Desenfoque</span>
-          </button>
-
-          <button class="filter-chip" type="button" data-filter="pixel" aria-pressed="false">
-            <span class="chip-ic">🟣</span>
-            <span class="chip-txt">Pixelado</span>
-          </button>
-
-          <button class="filter-chip" type="button" data-filter="thermal" aria-pressed="false">
-            <span class="chip-ic">🔴</span>
-            <span class="chip-txt">Cámara térmica</span>
-          </button>
-
-          <button class="filter-chip" type="button" data-filter="color" aria-pressed="false">
-            <span class="chip-ic">🟢</span>
-            <span class="chip-txt">Ajuste de color</span>
-          </button>
-
-          <button class="filter-chip" type="button" data-filter="fisheye" aria-pressed="false">
-            <span class="chip-ic">🐟</span>
-            <span class="chip-txt">Ojo de pescado</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- Footer -->
-      <div class="video-footer">
-        <button class="primary-btn" type="button" data-close>Cerrar</button>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- Otros modales -->
-  <div id="modal-stats" class="modal hidden" aria-hidden="true">
-  <div class="modal-card stats-modal" role="dialog" aria-modal="true" aria-labelledby="stats-title">
-    <button class="modal-close" type="button" data-close aria-label="Cerrar">✕</button>
-
-    <h2 id="stats-title">📊 Estadísticas</h2>
-
-    <div id="stats-content" class="stats-content">
-      <!-- Aquí stats.js renderiza dinámicamente:
-           - jugadores destacados
-           - estadio emblemático
-           - copas del mundo -->
-    </div>
-
-    <div class="video-footer">
-      <small>Estadísticas dinámicas por país detectado.</small>
-      <button class="primary-btn" type="button" data-close>Cerrar</button>
-    </div>
-  </div>
-</div>
-
-  <div id="modal-estadio" class="modal hidden" aria-hidden="true">
-    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="estadio-title">
-      <button class="modal-close" type="button" data-close aria-label="Cerrar">✕</button>
-      <h2 id="estadio-title">🏟 Información del Estadio</h2>
-      <p>Avance visual: aquí se mostrará sede, ciudad, capacidad y detalles del partido.</p>
-      <div class="modal-note">*Por ahora es maqueta visual.*</div>
-    </div>
-  </div>
-
-  <div id="modal-trivia" class="modal hidden" aria-hidden="true">
-  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="trivia-title">
-    <button class="modal-close" type="button" data-close aria-label="Cerrar">✕</button>
-
-    <!-- Header -->
-    <div class="trivia-head">
-      <div class="trivia-badge">🎮 Trivia (FE)</div>
-      <h2 id="trivia-title" class="trivia-title">Trivia — País detectado</h2>
-
-      <div class="trivia-meta" aria-label="Progreso y puntaje">
-        <div class="trivia-progress">
-          <span id="trivia-progress-text">Pregunta 1/5</span>
-          <div class="trivia-bar" aria-hidden="true">
-            <div id="trivia-bar-fill" class="trivia-bar-fill" style="width: 0%;"></div>
+      <div class="hero-points">
+        <div class="point-card">
+          <span class="point-icon">⚽</span>
+          <div>
+            <h3>Escaneo AR</h3>
+            <p>Reconocimiento de banderas con experiencia inmersiva en tiempo real.</p>
           </div>
         </div>
 
-        <div class="trivia-score">
-          <span class="trivia-score-label">Puntos</span>
-          <span id="trivia-score-value" class="trivia-score-value">0</span>
+        <div class="point-card">
+          <span class="point-icon">🎮</span>
+          <div>
+            <h3>Interacción</h3>
+            <p>Trivia, video, datos de estadio, estadísticas y animaciones 3D.</p>
+          </div>
+        </div>
+
+        <div class="point-card">
+          <span class="point-icon">📱</span>
+          <div>
+            <h3>Diseño móvil</h3>
+            <p>Interfaz optimizada para celular con estilo deportivo y visual moderno.</p>
+          </div>
         </div>
       </div>
+    </section>
 
-      <p class="trivia-sub">
-        Responde 5 preguntas rápidas relacionadas con el país escaneado.
+    <section class="hero-visual">
+      <div class="ball-stage">
+        <div class="ball-glow"></div>
+        <img
+          src="./assets/trionda_ball.png"
+          alt="Balón WorldScan 2026"
+          class="hero-ball floating-ball"
+          id="heroBall"
+        />
+      </div>
+
+      <div class="floating-tag tag-1">AR Web</div>
+      <div class="floating-tag tag-2">MindAR</div>
+      <div class="floating-tag tag-3">Mundial 2026</div>
+    </section>
+  </main>
+
+  <section id="info" class="info-section">
+    <div class="section-head">
+      <span class="section-kicker">¿Qué hace esta app?</span>
+      <h2>Una experiencia visual, interactiva y fácil de entender</h2>
+      <p>
+        La pantalla principal del escáner reconoce banderas y desbloquea contenido específico
+        por país dentro de una interfaz inspirada en el ambiente del Mundial.
       </p>
     </div>
 
-    <!-- Body -->
-    <div class="trivia-body">
-      <!-- Estado: si no hay bandera -->
-      <div id="trivia-empty" class="trivia-empty hidden">
-        <p><strong>Escanea una bandera</strong> para iniciar la trivia.</p>
-        <p class="modal-note">Tip: apunta a cualquier target para desbloquear preguntas.</p>
+    <div class="info-grid">
+      <article class="info-card">
+        <div class="info-number">01</div>
+        <h3>Apunta la cámara</h3>
+        <p>
+          El sistema detecta imágenes objetivo y activa contenido AR.
+        </p>
+      </article>
+
+      <article class="info-card">
+        <div class="info-number">02</div>
+        <h3>Explora el contenido</h3>
+        <p>
+          Abre módulos como video oficial, estadísticas, información del estadio y trivia temática.
+        </p>
+      </article>
+
+      <article class="info-card">
+        <div class="info-number">03</div>
+        <h3>Interactúa con AR</h3>
+        <p>
+          Observa elementos 3D, animaciones, texturas y efectos visuales relacionados con cada bandera.
+        </p>
+      </article>
+    </div>
+  </section>
+
+  <section class="features-section">
+    <div class="feature-panel">
+      <div class="feature-copy">
+        <span class="section-kicker">Contenido incluido</span>
+        <h2>Diseñado para que te informes de los paises que jugaran ebn mexico este 2026</h2>
+        <p>
+          La experiencia combina identidad visual futbolera, interfaz clara.
+        </p>
+
+        <ul class="feature-list">
+          <li>Reconocimiento de banderas</li>
+          <li>Pelota 3D y animaciones</li>
+          <li>Trivia por país</li>
+          <li>Estadísticas y estadio</li>
+          <li>Video con filtros permitidos</li>
+        </ul>
+
+        <a href="./scanner.html" class="btn btn-primary feature-btn">Comenzar escaneo</a>
       </div>
 
-      <!-- Pregunta -->
-      <div id="trivia-qwrap" class="trivia-qwrap">
-        <div id="trivia-question" class="trivia-question">
-          Cargando pregunta...
+      <div class="feature-side">
+        <div class="mini-card">
+          <span>🎥</span>
+          <strong>Video + filtros</strong>
+          <p>Contenido multimedia integrado a la experiencia.</p>
         </div>
 
-        <!-- Opciones -->
-        <div id="trivia-answers" class="trivia-answers" role="group" aria-label="Opciones">
-          <!-- Se llenan por JS con botones -->
-          <!-- Ejemplo:
-          <button class="trivia-answer" type="button" data-idx="0">Opción A</button>
-          -->
+        <div class="mini-card">
+          <span>📊</span>
+          <strong>Estadísticas</strong>
+          <p>Datos visuales por país detectado.</p>
         </div>
 
-        <!-- Feedback -->
-        <div id="trivia-feedback" class="trivia-feedback" aria-live="polite"></div>
-
-        <!-- Acciones -->
-        <div class="trivia-actions">
-          <button id="trivia-next" class="primary-btn" type="button" disabled>Siguiente</button>
-          <button id="trivia-restart" class="secondary-btn" type="button">Jugar de nuevo</button>
+        <div class="mini-card">
+          <span>🏟</span>
+          <strong>Estadio</strong>
+          <p>Información contextual del escenario más representativo.</p>
         </div>
-      </div>
 
-      <!-- Resultado final -->
-      <div id="trivia-result" class="trivia-result hidden" aria-live="polite">
-        <h3 class="trivia-result-title">Resultado</h3>
-        <p id="trivia-result-text" class="trivia-result-text">Obtuviste 0/5</p>
-
-        <div class="trivia-actions">
-          <button id="trivia-restart-2" class="primary-btn" type="button">Jugar de nuevo</button>
-          <button class="secondary-btn" type="button" data-close>Cerrar</button>
+        <div class="mini-card">
+          <span>🎮</span>
+          <strong>Trivia</strong>
+          <p>Bonus interactivo para reforzar el proyecto.</p>
         </div>
       </div>
     </div>
+  </section>
 
-    <!-- Footer -->
-    <div class="video-footer">
-      <small>Avance: trivia por país + puntaje + progreso (lista para conectar base de preguntas).</small>
-      <button class="primary-btn" type="button" data-close>Cerrar</button>
-    </div>
-  </div>
-</div>
+  <footer class="footer">
+    <p>WorldScan 2026 · Experiencia WebAR del Mundial 2026</p>
+    <a href="./scanner.html" class="footer-link">Abrir escáner</a>
+  </footer>
 
-
-  <!-- AR Scene -->
-  <a-scene
-    id="ar-scene"
-    mindar-image="imageTargetSrc: ./assets/targets.mind; autoStart: true; uiScanning: yes; uiLoading: yes; filterMinCF: 0.0001; filterBeta: 0.001; missTolerance: 5;"
-    color-space="sRGB"
-    renderer="colorManagement: true, physicallyCorrectLights"
-    vr-mode-ui="enabled: false"
-    device-orientation-permission-ui="enabled: false"
-  >
-  <a-assets>
-  <a-asset-item id="soccerBallGLB" src="./assets/classic_soccer_ball_new.glb"></a-asset-item>
-</a-assets>
-    <a-camera
-      position="0 0 0"
-      look-controls="enabled: false"
-      cursor="fuse: false; rayOrigin: mouse;"
-      raycaster="far: 10000; objects: .clickable"
-    ></a-camera>
-  </a-scene>
-
- <script src="./js/db-service.js"></script>
-<script src="./js/triviaData.js"></script>
-<script src="./js/trivia.js"></script>
-<script src="./js/statsData.js"></script>
-<script src="./js/stats.js"></script>
-<script src="./js/script.js"></script>
-
+  <script src="./js/landing.js"></script>
 </body>
 </html>
