@@ -482,6 +482,35 @@ body{
 }
 
 /* ======================================================
+   CONTROLES CUSTOM (SLIDERS)
+   ====================================================== */
+.custom-controls {
+  margin-top: 15px;
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 15px;
+}
+.slider-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.slider-group label {
+  font-size: 11px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.7);
+  letter-spacing: 0.5px;
+}
+.slider-group input[type="range"] {
+  width: 100%;
+  accent-color: #00b1e8;
+}
+
+/* ======================================================
    OVERLAY EFECTOS
    ====================================================== */
 

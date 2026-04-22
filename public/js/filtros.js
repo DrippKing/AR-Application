@@ -128,13 +128,59 @@ function setActiveFilter(filterName) {
   if (btn) btn.classList.add("active");
 }
 
+let currentSingleFilter = null;
+function applySingleFilterUI(name, intensity) {
+  if (!videoPreview) return;
+  if (name === "blur") {
+    videoPreview.style.filter = `blur(${(intensity / 100) * 8}px)`;
+  } else if (name === "color") {
+    const sat = 1 + (intensity / 100) * 1.5;
+    const con = 1 + (intensity / 100) * 0.5;
+    const hue = (intensity / 100) * -45;
+    videoPreview.style.filter = `saturate(${sat}) contrast(${con}) hue-rotate(${hue}deg)`;
+  } else if (name === "pixel") {
+    videoPreview.style.filter = `contrast(1.5) blur(${Math.max(1, (intensity/100)*4)}px)`;
+  } else if (name === "thermal") {
+    videoPreview.style.filter = `invert(1) hue-rotate(${(intensity/100)*180}deg) saturate(2)`;
+  }
+}
+
 // Click filtros: solo activar/desactivar visual
 filterButtons.forEach((btn) => {
   btn.addEventListener("click", () => {
-    // Toggle: si ya estaba activo, lo apagas
     const isActive = btn.classList.contains("active");
     filterButtons.forEach((b) => b.classList.remove("active"));
     if (!isActive) btn.classList.add("active");
+
+    const customControls = document.getElementById("custom-filter-controls");
+    const singleControl = document.getElementById("single-filter-control");
+    const singleSlider = document.getElementById("slide-single");
+    
+    if (isActive) {
+      if (customControls) customControls.classList.add("hidden");
+      if (singleControl) singleControl.classList.add("hidden");
+      if (videoPreview) videoPreview.style.filter = "none";
+      currentSingleFilter = null;
+      return;
+    }
+
+    currentSingleFilter = null;
+    const name = btn.dataset.filter;
+    
+    if (name === "custom") {
+      if (singleControl) singleControl.classList.add("hidden");
+      if (customControls) customControls.classList.remove("hidden");
+      applyCustomFilterUI(); 
+    } else {
+      if (customControls) customControls.classList.add("hidden");
+      if (singleControl) singleControl.classList.remove("hidden");
+      
+      currentSingleFilter = name;
+      if (singleSlider) {
+          singleSlider.value = 50;
+          applySingleFilterUI(name, 50);
+      }
+    }
 
     // Opcional: pausar/rewind para que se note que "hizo algo" (visual)
     if (videoPreview) {
@@ -146,6 +192,29 @@ filterButtons.forEach((btn) => {
   });
 });
 
+const singleSlider = document.getElementById("slide-single");
+if (singleSlider) {
+  singleSlider.addEventListener("input", (e) => {
+    if (currentSingleFilter) applySingleFilterUI(currentSingleFilter, e.target.value);
+  });
+}
+
+// --- Lógica del filtro en tiempo real para la maqueta ---
+function applyCustomFilterUI() {
+  if (!videoPreview) return;
+  const blur = document.getElementById("slide-blur").value;
+  const contrast = document.getElementById("slide-contrast").value;
+  const saturate = document.getElementById("slide-saturate").value;
+  const brightness = document.getElementById("slide-brightness").value;
+  const hue = document.getElementById("slide-hue").value;
+
+  videoPreview.style.filter = `blur(${blur}px) contrast(${contrast}%) saturate(${saturate}%) brightness(${brightness}%) hue-rotate(${hue}deg)`;
+}
+
+const customSliders = document.querySelectorAll("#custom-filter-controls input[type='range']");
+customSliders.forEach(slider => {
+  slider.addEventListener("input", applyCustomFilterUI);
+});
 
 // --- Actualizar UI del video según país detectado ---
 function updateVideoUIForCountry(country) {

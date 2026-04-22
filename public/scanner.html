@@ -41,7 +41,7 @@
         <feComposite width="10" height="10"/>
         <feTile result="a"/>
         <feComposite in="SourceGraphic" in2="a" operator="in"/>
-        <feMorphology operator="dilate" radius="5"/>
+        <feMorphology id="pixel-morph" operator="dilate" radius="5"/>
       </filter>
     </defs>
   </svg>
@@ -187,10 +187,42 @@
             <span class="chip-txt">Ajuste de color</span>
           </button>
 
-          <button class="filter-chip" type="button" data-filter="fisheye" aria-pressed="false">
-            <span class="chip-ic">🐟</span>
-            <span class="chip-txt">Ojo de pescado</span>
+          <button class="filter-chip" type="button" data-filter="custom" aria-pressed="false">
+            <span class="chip-ic">🎛️</span>
+            <span class="chip-txt">Ajuste manual</span>
           </button>
+        </div>
+
+        <!-- Controles deslizantes (Sliders) para el Filtro Custom -->
+        <div id="custom-filter-controls" class="custom-controls hidden">
+          <div class="slider-group">
+            <label for="slide-blur">Desenfoque</label>
+            <input type="range" id="slide-blur" min="0" max="10" step="0.5" value="0">
+          </div>
+          <div class="slider-group">
+            <label for="slide-contrast">Contraste</label>
+            <input type="range" id="slide-contrast" min="50" max="200" step="1" value="100">
+          </div>
+          <div class="slider-group">
+            <label for="slide-saturate">Saturación</label>
+            <input type="range" id="slide-saturate" min="0" max="300" step="1" value="100">
+          </div>
+          <div class="slider-group">
+            <label for="slide-brightness">Brillo</label>
+            <input type="range" id="slide-brightness" min="50" max="150" step="1" value="100">
+          </div>
+          <div class="slider-group">
+            <label for="slide-hue">Tono (Color)</label>
+            <input type="range" id="slide-hue" min="0" max="360" step="1" value="0">
+          </div>
+        </div>
+
+        <!-- Control de Intensidad (Filtros Simples) -->
+        <div id="single-filter-control" class="custom-controls hidden">
+          <div class="slider-group">
+            <label id="single-filter-label" for="slide-single">Intensidad del Filtro</label>
+            <input type="range" id="slide-single" min="0" max="100" step="1" value="50">
+          </div>
         </div>
       </div>
 

@@ -107,6 +107,39 @@
             <span class="chip-txt">Filtro custom</span>
           </button>
         </div>
+        
+        <!-- Controles deslizantes (Sliders) para el Filtro Custom -->
+        <div id="custom-filter-controls" class="custom-controls hidden" style="margin-top: 15px; padding: 15px; background: rgba(0, 0, 0, 0.3); border-radius: 14px; display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 15px;">
+          <div class="slider-group" style="display: flex; flex-direction: column; gap: 5px;">
+            <label for="slide-blur" style="font-size: 11px; text-transform: uppercase; color: rgba(255,255,255,0.7);">Desenfoque</label>
+            <input type="range" id="slide-blur" min="0" max="10" step="0.5" value="0">
+          </div>
+          <div class="slider-group" style="display: flex; flex-direction: column; gap: 5px;">
+            <label for="slide-contrast" style="font-size: 11px; text-transform: uppercase; color: rgba(255,255,255,0.7);">Contraste</label>
+            <input type="range" id="slide-contrast" min="50" max="200" step="1" value="100">
+          </div>
+          <div class="slider-group" style="display: flex; flex-direction: column; gap: 5px;">
+            <label for="slide-saturate" style="font-size: 11px; text-transform: uppercase; color: rgba(255,255,255,0.7);">Saturación</label>
+            <input type="range" id="slide-saturate" min="0" max="300" step="1" value="100">
+          </div>
+          <div class="slider-group" style="display: flex; flex-direction: column; gap: 5px;">
+            <label for="slide-brightness" style="font-size: 11px; text-transform: uppercase; color: rgba(255,255,255,0.7);">Brillo</label>
+            <input type="range" id="slide-brightness" min="50" max="150" step="1" value="100">
+          </div>
+          <div class="slider-group" style="display: flex; flex-direction: column; gap: 5px;">
+            <label for="slide-hue" style="font-size: 11px; text-transform: uppercase; color: rgba(255,255,255,0.7);">Tono (Color)</label>
+            <input type="range" id="slide-hue" min="0" max="360" step="1" value="0">
+          </div>
+        </div>
+
+        <!-- Control de Intensidad (Filtros Simples) -->
+        <div id="single-filter-control" class="custom-controls hidden" style="margin-top: 15px; padding: 15px; background: rgba(0, 0, 0, 0.3); border-radius: 14px;">
+          <div class="slider-group" style="display: flex; flex-direction: column; gap: 5px;">
+            <label id="single-filter-label" for="slide-single" style="font-size: 11px; text-transform: uppercase; color: rgba(255,255,255,0.7);">Intensidad del Filtro</label>
+            <input type="range" id="slide-single" min="0" max="100" step="1" value="50">
+          </div>
+        </div>
+
 
         <!-- Nota FE -->
         <div class="fe-note">

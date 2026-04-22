@@ -578,41 +578,59 @@ function clearVisualFX() {
   }
 }
 
-function setOverlayPixel() {
+function setOverlayPixel(intensity = 50) {
   if (videoPreview) {
-    // Aplicamos el filtro SVG inyectado en el HTML al reproductor de video
     videoPreview.style.filter = "url(#pixelate-effect)";
+    const morph = document.getElementById("pixel-morph");
+    if (morph) {
+      const radius = Math.max(1, Math.floor((intensity / 100) * 8)); 
+      morph.setAttribute("radius", radius);
+    }
   }
 }
 
-function setOverlayThermal() {
+function setOverlayThermal(intensity = 50) {
   const overlay = ensureOverlay();
   if (!overlay) return;
 
-  overlay.style.opacity = "0.42";
+  const op = 0.2 + (intensity / 100) * 0.6; // Opacidad entre 0.2 y 0.8
+  overlay.style.opacity = op.toString();
   overlay.style.mixBlendMode = "screen";
   overlay.style.background =
     "linear-gradient(90deg, rgba(0,0,255,0.65), rgba(0,255,255,0.55), rgba(0,255,0,0.55), rgba(255,255,0,0.55), rgba(255,120,0,0.55), rgba(255,0,0,0.55))";
 }
 
-function setOverlayFisheye() {
-  const overlay = ensureOverlay();
-  if (!overlay) return;
-
-  overlay.style.opacity = "1";
-  overlay.style.mixBlendMode = "normal";
-  overlay.style.background =
-    "radial-gradient(circle at 50% 50%, transparent 38%, rgba(0,0,0,0.75) 65%, #000 98%), radial-gradient(ellipse at 50% 0%, rgba(255,255,255,0.2) 0%, transparent 40%)";
+function setCssBlur(intensity = 50) {
+  if (!videoPreview) return;
+  const blurVal = (intensity / 100) * 8; // De 0px a 8px
+  videoPreview.style.filter = `blur(${blurVal}px)`;
 }
 
-function setCssBlur() {
+function setCssColorAdjust(intensity = 50) {
   if (!videoPreview) return;
-  videoPreview.style.filter = "blur(2px)";
+  const sat = 1 + (intensity / 100) * 1.5; 
+  const con = 1 + (intensity / 100) * 0.5; 
+  const hue = (intensity / 100) * -45;
+  videoPreview.style.filter = `saturate(${sat}) contrast(${con}) hue-rotate(${hue}deg)`;
 }
 
-function setCssColorAdjust() {
+let currentSingleFilter = null;
+function applySingleFilter(name, intensity) {
+  if (name === "blur") setCssBlur(intensity);
+  if (name === "color") setCssColorAdjust(intensity);
+  if (name === "pixel") setOverlayPixel(intensity);
+  if (name === "thermal") setOverlayThermal(intensity);
+}
+
+function applyCustomFilter() {
   if (!videoPreview) return;
-  videoPreview.style.filter = "saturate(1.25) contrast(1.08) hue-rotate(-6deg)";
+  const blur = document.getElementById("slide-blur").value;
+  const contrast = document.getElementById("slide-contrast").value;
+  const saturate = document.getElementById("slide-saturate").value;
+  const brightness = document.getElementById("slide-brightness").value;
+  const hue = document.getElementById("slide-hue").value;
+
+  videoPreview.style.filter = `blur(${blur}px) contrast(${contrast}%) saturate(${saturate}%) brightness(${brightness}%) hue-rotate(${hue}deg)`;
 }
 
 function setActiveFilterButton(activeBtn) {
@@ -625,21 +643,52 @@ filterButtons.forEach((btn) => {
     const name = btn.dataset.filter;
     const wasActive = btn.classList.contains("active");
 
+    const customControls = document.getElementById("custom-filter-controls");
+    const singleControl = document.getElementById("single-filter-control");
+    const singleSlider = document.getElementById("slide-single");
+
     if (wasActive) {
       setActiveFilterButton(null);
       clearVisualFX();
+      if (customControls) customControls.classList.add("hidden");
+      if (singleControl) singleControl.classList.add("hidden");
+      currentSingleFilter = null;
       return;
     }
 
     setActiveFilterButton(btn);
     clearVisualFX();
+    currentSingleFilter = null;
 
-    if (name === "blur") setCssBlur();
-    if (name === "color") setCssColorAdjust();
-    if (name === "pixel") setOverlayPixel();
-    if (name === "thermal") setOverlayThermal();
-    if (name === "fisheye") setOverlayFisheye();
+    if (name === "custom") {
+      if (singleControl) singleControl.classList.add("hidden");
+      if (customControls) customControls.classList.remove("hidden");
+      applyCustomFilter(); // Iniciar con los valores actuales de los sliders
+    } else {
+      if (customControls) customControls.classList.add("hidden");
+      if (singleControl) singleControl.classList.remove("hidden");
+      
+      currentSingleFilter = name;
+      if (singleSlider) {
+         singleSlider.value = 50; // Reiniciar siempre al 50%
+         applySingleFilter(name, 50);
+      }
+    }
   });
+});
+
+// Listeners para la barra de intensidad única
+const singleSlider = document.getElementById("slide-single");
+if (singleSlider) {
+  singleSlider.addEventListener("input", (e) => {
+    if (currentSingleFilter) applySingleFilter(currentSingleFilter, e.target.value);
+  });
+}
+
+// Listeners para actualizar el filtro custom en tiempo real mientras mueves las barras
+const customSliders = document.querySelectorAll("#custom-filter-controls input[type='range']");
+customSliders.forEach(slider => {
+  slider.addEventListener("input", applyCustomFilter);
 });
 
 function updateVideoUIForCountry(country) {
