@@ -81,6 +81,8 @@ body.no-scroll{
   align-items:center;
   gap:10px;
   color:white;
+  text-decoration:none;
+  cursor:pointer;
 }
 
 .banner-text{

@@ -2,7 +2,7 @@ const express = require('express');
 const path = require('path');
 const fs = require('fs');
 const app = express();
-const port = 3001;
+const port = 3000;
 
 // 1. Cargar Base de Datos Local (JSON)
 const dbPath = path.join(__dirname, 'db.json');
