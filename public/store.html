@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Tienda WorldScan 2026</title>
+  <link rel="stylesheet" href="./css/styles.css" />
+</head>
+<body class="store-page-body">
+  <div id="tittle-banner">
+    <div id="logo">
+      <img src="./assets/trionda_ball.png" alt="Logo Mundial 2026" width="36" height="36" />
+      <div class="banner-text">
+        <h1>WorldScan</h1>
+        <h3>2026</h3>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button id="cart-open-btn" class="banner-action header-cart-btn" type="button" aria-label="Abrir carrito">🛒</button>
+      <a href="./scanner.html" class="banner-action">Volver al escáner</a>
+    </div>
+  </div>
+
+  <main class="store-page">
+    <section class="store-panel">
+      <div class="store-head">
+        <span class="section-kicker">Tienda</span>
+        <h1>Productos del Mundial 2026</h1>
+        <p>Explora los artículos inspirados en los equipos de la base de datos local. Cada tarjeta muestra el nombre, la imagen y el precio.</p>
+      </div>
+
+      <div id="store-content" class="store-content">
+        <div class="store-loading">Cargando productos...</div>
+      </div>
+    </section>
+  </main>
+
+  <div id="modal-size" class="modal hidden" aria-hidden="true">
+    <div class="modal-card store-modal" role="dialog" aria-modal="true" aria-labelledby="size-title">
+      <button class="modal-close" type="button" data-close aria-label="Cerrar">✕</button>
+      <div class="modal-head">
+        <h2 id="size-title">Personaliza tu jersey</h2>
+        <p>Selecciona la talla que prefieras antes de agregarlo al carrito.</p>
+      </div>
+      <div class="modal-body store-size-body">
+        <div class="store-modal-top">
+          <div class="store-modal-preview">
+            <img id="size-product-img" src="" alt="Producto" />
+          </div>
+          <div class="store-modal-meta">
+            <div>
+              <h3 id="size-product-name"></h3>
+              <p id="size-product-price"></p>
+            </div>
+            <div class="custom-fields">
+              <label>Nombre en el jersey<input type="text" id="jersey-name" placeholder="Ej. ÁLVAREZ" style="text-transform: uppercase;" /></label>
+              <label>Número en el jersey<input type="number" id="jersey-number" min="0" placeholder="10" /></label>
+            </div>
+          </div>
+        </div>
+        <div class="size-options">
+          <label><input type="radio" name="size" value="XS" /> XS</label>
+          <label><input type="radio" name="size" value="S" /> S</label>
+          <label><input type="radio" name="size" value="M" checked /> M</label>
+          <label><input type="radio" name="size" value="L" /> L</label>
+          <label><input type="radio" name="size" value="XL" /> XL</label>
+        </div>
+      </div>
+      <div class="video-footer modal-footer-group">
+        <button id="add-to-cart-btn" class="primary-btn" type="button">Agregar al carrito</button>
+        <button class="secondary-btn" type="button" data-close>Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-cart" class="modal hidden" aria-hidden="true">
+    <div class="modal-card store-modal" role="dialog" aria-modal="true" aria-labelledby="cart-title">
+      <button class="modal-close" type="button" data-close aria-label="Cerrar">✕</button>
+      <div class="modal-head">
+        <h2 id="cart-title">Carrito de compras</h2>
+        <p>Revisa los productos seleccionados y continúa con la compra.</p>
+      </div>
+      <div class="modal-body store-cart-body">
+        <div id="cart-items" class="cart-items"></div>
+        <div id="cart-empty" class="store-empty hidden">Tu carrito está vacío. Agrega productos desde la tienda.</div>
+        <div class="cart-total-row hidden" id="cart-total-row">
+          <span>Total</span>
+          <strong id="cart-total-price">$0.00</strong>
+        </div>
+        <div id="checkout-step" class="checkout-step hidden">
+          <p class="checkout-summary">Total a pagar: <strong id="checkout-total"></strong></p>
+          <button id="continue-checkout-btn" class="primary-btn" type="button">Continuar</button>
+        </div>
+        <form id="shipping-form" class="shipping-form hidden">
+          <h3>Dirección de envío</h3>
+          <label>Nombre completo<input type="text" id="shipping-name" required /></label>
+          <label>Dirección<input type="text" id="shipping-address" required /></label>
+          <label>Ciudad<input type="text" id="shipping-city" required /></label>
+          <label>Estado / Provincia<input type="text" id="shipping-state" required /></label>
+          <label>Código postal<input type="text" id="shipping-zip" required /></label>
+          <label>Teléfono<input type="tel" id="shipping-phone" required /></label>
+          <button id="confirm-purchase-btn" class="primary-btn" type="button">Confirmar compra</button>
+        </form>
+        <div id="purchase-success" class="store-empty hidden"></div>
+      </div>
+      <div class="video-footer">
+        <button id="finalize-purchase-btn" class="primary-btn" type="button">Finalizar compra</button>
+        <button class="secondary-btn" type="button" data-close>Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="./js/store.js"></script>
+</body>
+</html>

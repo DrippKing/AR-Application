@@ -2,7 +2,7 @@ const express = require('express');
 const path = require('path');
 const fs = require('fs');
 const app = express();
-const port = 3000;
+const port = 3001;
 
 // 1. Cargar Base de Datos Local (JSON)
 const dbPath = path.join(__dirname, 'db.json');
@@ -42,6 +42,11 @@ app.get('/api/trivia/:codigo', (req, res) => {
     // Filtramos las trivias que coincidan con el código de país
     const triviasDelPais = db.trivias.filter(t => t.pais_codigo === codigo);
     res.json(triviasDelPais);
+});
+
+// Obtener lista completa de países / productos para la tienda
+app.get('/api/paises', (req, res) => {
+    res.json(db.paises);
 });
 
 app.listen(port, () => {
