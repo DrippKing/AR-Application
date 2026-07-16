@@ -38,7 +38,7 @@ body{
   left:50%;
   transform:translateX(-50%);
   height:auto;
-  background-image: linear-gradient(to right, #08b059, #00b1e8, #203771);
+  background-color:#161616;
   display:flex;
   justify-content:center;
   padding:8px 14px;

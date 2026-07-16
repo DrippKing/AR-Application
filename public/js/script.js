@@ -398,6 +398,10 @@ function closeAllModals() {
   }
 }
 
+function hasVisibleModal() {
+  return modals.some((modal) => !modal.classList.contains("hidden"));
+}
+
 function openModalById(id) {
   closeAllModals();
 
@@ -848,20 +852,28 @@ if (!scene) {
       });
 
       entity.addEventListener("targetLost", () => {
+        const shouldPreserveUI = hasVisibleModal();
+
         if (currentTargetEntity === entity) {
-          currentCountry = null;
-          currentBall = null;
-          currentTargetEntity = null;
-        }
+          if (!shouldPreserveUI) {
+            currentCountry = null;
+            currentBall = null;
+            currentTargetEntity = null;
+          }
 
-        hideHUD();
-        closeAllModals();
-        setStatus("Apunta a una bandera...");
+          if (!shouldPreserveUI) {
+            hideHUD();
+            closeAllModals();
+            setStatus("Apunta a una bandera...");
 
-        stopBounce(ball);
+            stopBounce(ball);
 
-        if (window.Trivia && typeof window.Trivia.reset === "function") {
-          window.Trivia.reset();
+            if (window.Trivia && typeof window.Trivia.reset === "function") {
+              window.Trivia.reset();
+            }
+          } else {
+            setStatus(`${currentCountry?.name || "País"} · seguimiento perdido, menú abierto`);
+          }
         }
       });
 
