@@ -13,16 +13,23 @@ async function loadStoreProducts() {
     if (!response.ok) throw new Error('No se pudieron cargar los productos');
 
     const paises = await response.json();
-    currentProducts = paises;
+    const pricesResponse = await fetch('/jerseys.json');
+    if (!pricesResponse.ok) throw new Error('No se pudieron cargar los precios de jerseys');
+    const jerseyPrices = await pricesResponse.json();
 
-    const cards = paises.map((pais, index) => {
+    currentProducts = paises.map((pais) => ({
+      ...pais,
+      precio: jerseyPrices[pais.codigo] ?? 0,
+    }));
+
+    const cards = currentProducts.map((pais, index) => {
       return `
         <article class="store-card">
           <h3>${pais.nombre}</h3>
           <button type="button" class="store-image store-image-btn" data-index="${index}">
             <img src="${getStoreImage(pais.codigo)}" alt="${pais.nombre}" />
           </button>
-          <div class="store-price">${getStorePrice(index)}</div>
+          <div class="store-price">${formatPrice(pais.precio)}</div>
         </article>
       `;
     }).join('');
@@ -119,7 +126,7 @@ function setupStoreEvents() {
 function openSizeModal(product, index) {
   currentProduct = {
     ...product,
-    price: Number(getStorePrice(index).replace('$', '')),
+    price: product.precio,
     image: getStoreImage(product.codigo),
   };
 
@@ -256,28 +263,17 @@ function confirmPurchase() {
 }
 
 function formatPrice(value) {
-  return `$${value.toFixed(2)}`;
+  if (typeof value === 'number') {
+    return `${value.toLocaleString()} pts`;
+  }
+  const num = Number(value) || 0;
+  return `${num.toLocaleString()} pts`;
 }
 
-function getStorePrice(index) {
-  const prices = [24.99, 29.99, 34.99, 19.99, 44.99, 39.99, 27.99, 22.99, 31.99, 26.99];
-  return `$${(prices[index] || 29.99).toFixed(2)}`;
-}
 
 function getStoreImage(code) {
-  const imageMap = {
-    MEX: './assets/img/Mexico.jpg',
-    COL: './assets/img/Colombia.jpg',
-    JPN: './assets/img/Japon.jpg',
-    ESP: './assets/img/España.jpg',
-    KOR: './assets/img/Corea_del_Sur.jpg',
-    NED: './assets/img/Paises_Bajos.jpg',
-    RSA: './assets/img/Sudafrica.jpg',
-    TUN: './assets/img/Tunez.jpg',
-    URU: './assets/img/Uruguay.jpg',
-    UZB: './assets/img/Uzbekistan.jpg',
-  };
-  return imageMap[code] || './assets/trionda_ball.png';
+  // Prefer jerseys folder in assets; filenames expected to match country code (e.g., MEX.jpg)
+  return `./assets/jerseys/${code}.png` || './assets/trionda_ball.png';
 }
 
 loadStoreProducts();
