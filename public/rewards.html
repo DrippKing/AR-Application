@@ -14,13 +14,17 @@
       --accent: #f59e0b;
       --accent-2: #22c55e;
       --border: rgba(255,255,255,0.12);
+      --shadow: rgba(0,0,0,0.35);
     }
 
     * { box-sizing: border-box; }
     body {
       margin: 0;
       font-family: Arial, sans-serif;
-      background: linear-gradient(135deg, var(--bg), #1e293b);
+      background:
+        radial-gradient(circle at top left, rgba(245,158,11,0.16), transparent 24%),
+        radial-gradient(circle at bottom right, rgba(34,197,94,0.14), transparent 28%),
+        linear-gradient(135deg, var(--bg), #1e293b);
       color: var(--text);
       min-height: 100vh;
       display: flex;
@@ -30,29 +34,48 @@
     }
 
     .wrap {
-      width: min(900px, 100%);
+      width: min(980px, 100%);
       background: rgba(17,24,39,0.92);
       border: 1px solid var(--border);
       border-radius: 24px;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.35);
+      box-shadow: 0 24px 60px var(--shadow);
       overflow: hidden;
+      backdrop-filter: blur(12px);
     }
 
     .hero {
-      padding: 28px;
-      background: linear-gradient(90deg, rgba(245,158,11,0.2), rgba(34,197,94,0.16));
-      border-bottom: 1px solid var(--border);
+      padding: 30px 28px 24px;
+      background: linear-gradient(135deg, #c28a1a 0%, #f7d46a 28%, #a96d0b 58%, #f2c94c 100%);
+      border-bottom: 1px solid rgba(255,255,255,0.16);
+      position: relative;
+      color: #1f1400;
+      box-shadow: inset 0 -1px 0 rgba(255,255,255,0.2);
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: auto 24px 8px auto;
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,255,255,0.35), rgba(255,255,255,0) 70%);
+      pointer-events: none;
     }
 
     .hero h1 {
       margin: 0 0 10px;
-      font-size: 28px;
+      font-size: clamp(24px, 3vw, 32px);
+      letter-spacing: 0.02em;
     }
 
     .hero p {
       margin: 0;
-      color: var(--muted);
-      line-height: 1.5;
+      color: #3f2a00;
+      line-height: 1.6;
+      max-width: 680px;
+      font-weight: 600;
+      text-shadow: 0 1px 0 rgba(255,255,255,0.25);
     }
 
     .balance {
@@ -63,19 +86,21 @@
       padding: 22px 28px;
       border-bottom: 1px solid var(--border);
       flex-wrap: wrap;
+      background: rgba(255,255,255,0.02);
     }
 
     .points-box {
-      background: var(--card-2);
+      background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03));
       padding: 16px 20px;
       border-radius: 16px;
       min-width: 220px;
+      border: 1px solid rgba(255,255,255,0.12);
     }
 
     .points-label {
       font-size: 12px;
       text-transform: uppercase;
-      color: var(--muted);
+      color: #d1d5db;
       letter-spacing: 0.08em;
     }
 
@@ -96,6 +121,7 @@
       background: linear-gradient(90deg, var(--accent), #fb923c);
       text-decoration: none;
       display: inline-block;
+      box-shadow: 0 8px 22px rgba(245,158,11,0.22);
     }
 
     .content {
@@ -105,10 +131,11 @@
     }
 
     .card {
-      background: var(--card);
+      background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.025));
       border: 1px solid var(--border);
-      border-radius: 18px;
-      padding: 18px;
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
     }
 
     .card h2 {
@@ -117,43 +144,63 @@
     }
 
     .card p {
-      margin: 0 0 12px;
-      color: var(--muted);
-      line-height: 1.5;
+      margin: 0 0 14px;
+      color: #e5e7eb;
+      line-height: 1.6;
     }
 
     .packs {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
       gap: 12px;
     }
 
     .pack {
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 14px;
-      background: var(--card-2);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 16px;
+      padding: 16px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.025));
       cursor: pointer;
-      transition: transform 0.15s ease, border-color 0.15s ease;
+      transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
     }
 
     .pack:hover {
       transform: translateY(-2px);
-      border-color: rgba(245,158,11,0.6);
+      border-color: rgba(245,158,11,0.55);
+      background: linear-gradient(135deg, rgba(245,158,11,0.16), rgba(255,255,255,0.04));
     }
 
-    .pack strong { display: block; margin-bottom: 6px; }
-    .pack .price { color: #86efac; margin-bottom: 10px; }
+    .pack strong {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 15px;
+    }
+
+    .pack .price {
+      color: #86efac;
+      margin: 4px 0 0;
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+
+    .pack .points {
+      margin: 0 0 4px;
+      font-size: 2rem;
+      line-height: 1.1;
+      color: #f7d46a;
+    }
 
     .mini {
       font-size: 13px;
-      color: var(--muted);
+      color: #d1d5db;
+      line-height: 1.4;
+      margin-top: 8px;
     }
 
     .modal {
       position: fixed;
       inset: 0;
-      background: rgba(2, 6, 23, 0.75);
+      background: rgba(2, 6, 23, 0.78);
       display: none;
       align-items: center;
       justify-content: center;
@@ -166,12 +213,12 @@
     }
 
     .modal-card {
-      width: min(480px, 100%);
-      background: var(--card);
+      width: min(500px, 100%);
+      background: linear-gradient(180deg, rgba(17,24,39,0.98), rgba(15,23,42,0.96));
       border: 1px solid var(--border);
       border-radius: 20px;
       padding: 20px;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.35);
+      box-shadow: 0 24px 60px rgba(0,0,0,0.4);
     }
 
     .modal-card h3 {
@@ -181,7 +228,7 @@
 
     .modal-card p {
       margin: 0 0 16px;
-      color: var(--muted);
+      color: #e5e7eb;
       line-height: 1.5;
     }
 
@@ -194,7 +241,7 @@
 
     .field label {
       font-size: 13px;
-      color: var(--muted);
+      color: #f3f4f6;
       text-transform: uppercase;
       letter-spacing: 0.06em;
     }
@@ -205,6 +252,11 @@
       border: 1px solid var(--border);
       background: #0f172a;
       color: white;
+      outline: none;
+    }
+
+    .field input:focus {
+      border-color: rgba(245,158,11,0.6);
     }
 
     .actions {
@@ -236,28 +288,36 @@
         <div class="points-label">Puntos disponibles</div>
         <div class="points-value" id="pointsValue">0</div>
       </div>
-      <button class="btn" id="addPointsBtn">+ Añadir puntos</button>
     </section>
 
     <section class="content">
       <div class="card">
         <h2>Recargar puntos</h2>
-        <p>Selecciona un paquete y completa el formulario para simular la compra con tarjeta.</p>
+        <p>Selecciona un paquete y completa el formulario para continuar con tu compra.</p>
         <div class="packs">
-          <div class="pack" data-pack="basic" data-name="Pack básico" data-points="500" data-price="$5 USD">
-            <strong>Pack básico</strong>
-            <div class="price">$5 USD · 500 pts</div>
-            <div class="mini">Ideal para empezar.</div>
+          <div class="pack" data-pack="basic" data-name="Plan básico" data-points="800" data-price="159 MXN">
+            <strong>Plan básico</strong>
+            <h1 class="points">800 pts</h1>
+            <h3 class="price">159 MXN</h3>
+            <div class="mini">Perfecto para comenzar a acumular beneficios.</div>
           </div>
-          <div class="pack" data-pack="premium" data-name="Pack premium" data-points="1200" data-price="$10 USD">
-            <strong>Pack premium</strong>
-            <div class="price">$10 USD · 1200 pts</div>
-            <div class="mini">Más valor para recompensas.</div>
+          <div class="pack" data-pack="premium" data-name="Plan premium" data-points="2400" data-price="399 MXN">
+            <strong>Plan premium</strong>
+            <h1 class="points">2400 pts</h1>
+            <h3 class="price">399 MXN</h3>
+            <div class="mini">Ideal para disfrutar de recompensas más frecuentes.</div>
           </div>
-          <div class="pack" data-pack="elite" data-name="Pack elite" data-points="2600" data-price="$20 USD">
-            <strong>Pack elite</strong>
-            <div class="price">$20 USD · 2600 pts</div>
-            <div class="mini">Para usuarios frecuentes.</div>
+          <div class="pack" data-pack="elite" data-name="Plan elite" data-points="4500" data-price="649 MXN">
+            <strong>Plan elite</strong>
+            <h1 class="points">4500 pts</h1>
+            <h3 class="price">649 MXN</h3>
+            <div class="mini">Una opción sólida para usuarios que quieren más alcance.</div>
+          </div>
+          <div class="pack" data-pack="pro" data-name="Plan pro" data-points="12500" data-price="1629 MXN">
+            <strong>Plan pro</strong>
+            <h1 class="points">12500 pts</h1>
+            <h3 class="price">1629 MXN</h3>
+            <div class="mini">El plan más completo para quienes aprovechan al máximo sus beneficios.</div>
           </div>
         </div>
       </div>
@@ -298,7 +358,6 @@
 
   <script>
     const pointsValue = document.getElementById('pointsValue');
-    const addPointsBtn = document.getElementById('addPointsBtn');
     const paymentModal = document.getElementById('paymentModal');
     const modalTitle = document.getElementById('modalTitle');
     const modalSubtitle = document.getElementById('modalSubtitle');
@@ -342,11 +401,6 @@
         closeModal();
         alert(`¡Pago confirmado! Se añadieron ${selectedPack.points} puntos.`);
       }
-    });
-
-    addPointsBtn.addEventListener('click', () => {
-      points += 250;
-      renderPoints();
     });
 
     renderPoints();
