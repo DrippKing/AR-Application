@@ -26,8 +26,8 @@ body{
   color:white;
 }
 
-body.store-page-body{
-  overflow:auto;
+body.page-scrollable {
+  overflow: auto;
 }
 
 body.no-scroll{

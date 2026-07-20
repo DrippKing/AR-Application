@@ -27,5 +27,12 @@
     { "pais_codigo": "TUN", "pregunta": "¿Apodo de la selección?", "opciones": ["Águilas de Cartago", "Leones", "Faraones"], "respuesta_correcta": 0 },
     { "pais_codigo": "URU", "pregunta": "¿Cuántos Mundiales ha ganado?", "opciones": ["0", "1", "2"], "respuesta_correcta": 2 },
     { "pais_codigo": "UZB", "pregunta": "¿En qué continente está?", "opciones": ["Europa", "Asia", "África"], "respuesta_correcta": 1 }
+  ],
+  "usuarios": [
+    { "id": 1, "nombre": "Fernando Pérez", "correo": "fernando.perez@example.com" },
+    { "id": 2, "nombre": "María García", "correo": "maria.garcia@example.com" },
+    { "id": 3, "nombre": "Carlos Rodríguez", "correo": "carlos.rodriguez@example.com" },
+    { "id": 4, "nombre": "Ana Martínez", "correo": "ana.martinez@example.com" },
+    { "id": 5, "nombre": "Pedro López", "correo": "pedro.lopez@example.com" }
   ]
 }

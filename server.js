@@ -3,22 +3,70 @@ const path = require('path');
 const fs = require('fs');
 const app = express();
 const port = 3000;
+const htmlDir = path.join(__dirname, 'public', 'html');
+
+function sendHtmlPage(res, pageName) {
+    const filePath = path.join(htmlDir, `${pageName}.html`);
+    // fs.existsSync es síncrono, es mejor usar res.sendFile que maneja errores y streaming.
+    res.sendFile(filePath, (err) => {
+        if (err) {
+            res.status(404).send('Página no encontrada');
+        }
+    });
+}
 
 // 1. Cargar Base de Datos Local (JSON)
-const dbPath = path.join(__dirname, 'db.json');
-let db = { paises: [], trivias: [] };
+const dbPath = path.join(__dirname, 'database.json');
+let db = { paises: [], trivias: [], usuarios: [] };
 
 try {
     const data = fs.readFileSync(dbPath, 'utf8');
     db = JSON.parse(data);
     console.log('✅ Base de datos JSON conectada exitosamente.');
 } catch (error) {
-    console.error('❌ Error al cargar db.json:', error.message);
-    console.log('Asegúrate de que el archivo db.json existe en la raíz del proyecto.');
+    console.error('❌ Error al cargar database.json:', error.message);
+    console.log('Asegúrate de que el archivo database.json existe en la raíz del proyecto.');
 }
 
-// 2. Servir archivos estáticos (HTML, CSS, JS, Assets)
+// 2. Servir archivos estáticos (CSS, JS, Assets) desde la carpeta 'public'
 app.use(express.static(path.join(__dirname, 'public')));
+
+// 2. Servir archivos estáticos (HTML, CSS, JS, Assets)
+app.get('/', (req, res) => {
+    res.redirect('/home');
+});
+
+app.get(['/home', '/home.html'], (req, res) => {
+    sendHtmlPage(res, 'home');
+});
+
+app.get(['/scanner', '/scanner.html'], (req, res) => {
+    sendHtmlPage(res, 'scanner');
+});
+
+app.get(['/store', '/store.html'], (req, res) => {
+    sendHtmlPage(res, 'store');
+});
+
+app.get(['/rewards', '/rewards.html'], (req, res) => {
+    sendHtmlPage(res, 'rewards');
+});
+
+app.get(['/filtros', '/filtros.html'], (req, res) => {
+    sendHtmlPage(res, 'filtros');
+});
+
+app.get('/html/:page.html', (req, res) => {
+    sendHtmlPage(res, req.params.page);
+});
+
+app.get(['/profile', '/profile.html'], (req, res) => {
+    sendHtmlPage(res, 'profile');
+});
+
+app.get('/html', (req, res) => {
+    res.redirect('/home');
+});
 
 // 3. API Endpoints (Para que el Frontend consuma datos)
 
