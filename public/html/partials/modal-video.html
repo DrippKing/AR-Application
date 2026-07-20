@@ -1,0 +1,138 @@
+<div class="modal-card video-editor" role="dialog" aria-modal="true" aria-labelledby="video-title">
+  <button class="modal-close" type="button" data-close aria-label="Cerrar">✕</button>
+
+  <!-- Header -->
+  <div class="video-head">
+    <div class="video-badge">🎥 Video + Filtros (FE)</div>
+    <h2 id="video-title" class="video-title">Video oficial — País detectado</h2>
+    <p class="video-sub">
+      Selecciona un video del acervo y aplica filtros permitidos.
+    </p>
+  </div>
+
+  <!-- Layout editor: Player + Sidebar -->
+  <div class="editor-grid">
+
+    <!-- Player -->
+    <div class="player-shell" aria-label="Reproductor de video">
+      <div class="player-top">
+        <span class="player-dot"></span>
+        <span class="player-dot"></span>
+        <span class="player-dot"></span>
+        <span class="player-label">WORLD CUP 2026 • PREVIEW</span>
+      </div>
+
+      <!-- ✅ VIDEO REAL -->
+      <video
+        id="video-preview"
+        class="video-preview"
+        preload="metadata"
+        playsinline
+        controls
+        src="/assets/movies/Germany v Mexico  2018 FIFA World Cup  Match Highlights.mp4"
+      ></video>
+
+      <!-- Overlay tipo marcador (futbolero) -->
+      <div class="scoreboard" aria-hidden="true">
+        <div class="sb-left">WS</div>
+        <div class="sb-mid">LIVE</div>
+        <div class="sb-right">2026</div>
+      </div>
+
+      <!-- Overlay FX (pixel/thermal/custom) -->
+      <div id="fx-overlay" class="fx-overlay" aria-hidden="true"></div>
+    </div>
+
+    <!-- Sidebar: Acervo -->
+    <aside class="video-side" aria-label="Acervo de videos">
+      <div class="side-title">Acervo (Mundial 2026)</div>
+
+      <div class="video-list">
+
+        <!-- Item real -->
+        <button class="video-item active" type="button"
+                data-src="/assets/movies/Germany v Mexico  2018 FIFA World Cup  Match Highlights.mp4"
+                data-title="Video oficial — Highlights">
+          <div class="thumb">
+            <span class="thumb-tag">OFICIAL</span>
+            <span class="thumb-play">▶</span>
+          </div>
+          <div class="meta">
+            <div class="meta-title">Highlights — Oficial</div>
+            <div class="meta-sub">Germany v Mexico...</div>
+          </div>
+        </button>
+
+      </div>
+    </aside>
+
+  </div>
+
+  <!-- Filtros (permitidos) -->
+  <div class="filters">
+    <div class="filters-title">Filtros permitidos (FE)</div>
+
+    <div class="filters-grid">
+      <button class="filter-chip" type="button" data-filter="blur" aria-pressed="false">
+        <span class="chip-ic">🔵</span>
+        <span class="chip-txt">Desenfoque</span>
+      </button>
+
+      <button class="filter-chip" type="button" data-filter="pixel" aria-pressed="false">
+        <span class="chip-ic">🟣</span>
+        <span class="chip-txt">Pixelado</span>
+      </button>
+
+      <button class="filter-chip" type="button" data-filter="thermal" aria-pressed="false">
+        <span class="chip-ic">🔴</span>
+        <span class="chip-txt">Arcoiris</span>
+      </button>
+
+      <button class="filter-chip" type="button" data-filter="color" aria-pressed="false">
+        <span class="chip-ic">🟢</span>
+        <span class="chip-txt">Ajuste de color</span>
+      </button>
+
+      <button class="filter-chip" type="button" data-filter="custom" aria-pressed="false">
+        <span class="chip-ic">🎛️</span>
+        <span class="chip-txt">Ajuste manual</span>
+      </button>
+    </div>
+
+    <!-- Controles deslizantes (Sliders) para el Filtro Custom -->
+    <div id="custom-filter-controls" class="custom-controls hidden">
+      <div class="slider-group">
+        <label for="slide-blur">Desenfoque</label>
+        <input type="range" id="slide-blur" min="0" max="10" step="0.5" value="0">
+      </div>
+      <div class="slider-group">
+        <label for="slide-contrast">Contraste</label>
+        <input type="range" id="slide-contrast" min="50" max="200" step="1" value="100">
+      </div>
+      <div class="slider-group">
+        <label for="slide-saturate">Saturación</label>
+        <input type="range" id="slide-saturate" min="0" max="300" step="1" value="100">
+      </div>
+      <div class="slider-group">
+        <label for="slide-brightness">Brillo</label>
+        <input type="range" id="slide-brightness" min="50" max="150" step="1" value="100">
+      </div>
+      <div class="slider-group">
+        <label for="slide-hue">Tono (Color)</label>
+        <input type="range" id="slide-hue" min="0" max="360" step="1" value="0">
+      </div>
+    </div>
+
+    <!-- Control de Intensidad (Filtros Simples) -->
+    <div id="single-filter-control" class="custom-controls hidden">
+      <div class="slider-group">
+        <label id="single-filter-label" for="slide-single">Intensidad del Filtro</label>
+        <input type="range" id="slide-single" min="0" max="100" step="1" value="50">
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="video-footer">
+  </div>
+</div>

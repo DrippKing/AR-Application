@@ -60,6 +60,18 @@ app.get('/html/:page.html', (req, res) => {
     sendHtmlPage(res, req.params.page);
 });
 
+// Ruta corregida para servir los parciales de los modales.
+// Ahora acepta el nombre completo del archivo (ej: 'modal-video.html')
+app.get('/html/partials/:partialName', (req, res) => {
+    const partialName = req.params.partialName;
+    // Asegurarnos de que no se intente acceder a archivos fuera del directorio 'partials'
+    if (partialName.includes('..')) {
+        return res.status(400).send('Nombre de archivo inválido');
+    }
+    const filePath = path.join(htmlDir, 'partials', partialName);
+    res.sendFile(filePath, (err) => { if (err) res.status(404).send('Parcial no encontrado'); });
+});
+
 app.get(['/profile', '/profile.html'], (req, res) => {
     sendHtmlPage(res, 'profile');
 });

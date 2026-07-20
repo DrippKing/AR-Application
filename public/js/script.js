@@ -343,13 +343,12 @@ const statusText = document.getElementById("status-text");
 
 // --- HUD + MODALES ---
 const hud = document.getElementById("hud");
-const modals = Array.from(document.querySelectorAll(".modal"));
 const arAnimationBtn = document.getElementById("btn-ar-animation");
 const starsFx = document.getElementById("fx-stars");
 
 // Video editor UI
-const videoModal = document.getElementById("modal-video");
-const videoTitle = document.querySelector("#modal-video .video-title");
+// Estas variables ahora se deben buscar DESPUÉS de cargar el modal
+/* const videoTitle = document.querySelector("#modal-video .video-title");
 const videoPreview = document.getElementById("video-preview");
 const videoItems = Array.from(document.querySelectorAll("#modal-video .video-item"));
 const filterButtons = Array.from(document.querySelectorAll("#modal-video .filter-chip"));
@@ -358,7 +357,9 @@ const playerShell = document.querySelector("#modal-video .player-shell");
 let currentCountry = null;
 let currentBall = null;
 let currentTargetEntity = null;
-let starsTimeout = null;
+let starsTimeout = null; */
+
+let currentCountry = null;
 
 // Mapa de rutas de texturas por país
 const flagTextures = {
@@ -386,37 +387,13 @@ function showHUD() {
 }
 
 function hideHUD() {
-  if (hud) hud.classList.add("hidden");
-}
-
-function closeAllModals() {
-  modals.forEach((m) => m.classList.add("hidden"));
-
-  // Detener cualquier video que se esté reproduciendo
-  if (videoPreview && !videoPreview.paused) {
-    videoPreview.pause();
-  }
-}
-
-function hasVisibleModal() {
-  return modals.some((modal) => !modal.classList.contains("hidden"));
-}
-
-function openModalById(id) {
-  closeAllModals();
-
-  const modal = document.getElementById(id);
-  if (!modal) return;
-
-  modal.classList.remove("hidden");
-
-  const card = modal.querySelector(".modal-card");
-  if (card) card.scrollTop = 0;
-  modal.scrollTop = 0;
-}
+/*   if (hud) hud.classList.add("hidden");
+ */}
 
 hideHUD();
-closeAllModals();
+if (window.ModalManager) {
+  window.ModalManager.closeAll();
+}
 
 // =====================================================
 // Partículas overlay (GIF)
@@ -447,84 +424,39 @@ function playStarsFX(duration = 2000) {
 // =====================================================
 if (hud) {
   hud.addEventListener("click", (e) => {
-    const btn = e.target.closest("[data-modal]");
+    const btn = e.target.closest("[data-modal-name]");
     if (!btn) return;
 
-    const modalId = btn.getAttribute("data-modal");
-    if (!modalId) return;
+    const name = btn.dataset.modalName; // HTML: data-modal-name -> JS: dataset.modalName
+    if (!name) return;
 
-    openModalById(modalId);
-
-    // ✅ TRIVIA
-    if (modalId === "modal-trivia") {
-      const countryId = currentCountry ? currentCountry.id : null;
-
-      if (window.Trivia && typeof window.Trivia.start === "function") {
-        window.Trivia.start(countryId);
-      }
-    }
-
-    // ✅ ESTADÍSTICAS (AGREGAR ESTO AQUÍ)
-    if (modalId === "modal-stats") {
-      const countryId = currentCountry ? currentCountry.id : null;
-
-      if (window.Stats && typeof window.Stats.render === "function") {
-        window.Stats.render(countryId);
-      }
-    }
-
-    // estadio
-     if (modalId === "modal-estadio") {
-     const countryId = currentCountry ? currentCountry.id : null;
-
-      if (window.Stadium && typeof window.Stadium.render === "function") {
-      window.Stadium.render(countryId);
-      }
-     }
-  });
-}
-
-// Botón especial para animación AR
-if (arAnimationBtn) {
-  arAnimationBtn.addEventListener("click", () => {
-    if (!currentBall || !currentCountry) {
-      alert("Primero escanea una bandera para activar la animación AR.");
-      return;
-    }
-
-    triggerBounce(currentBall);
-    playStarsFX(2000);
+    // Usamos el nuevo ModalManager
+    window.ModalManager.load(name, currentCountry);
   });
 }
 
 // =====================================================
 // Cerrar modales
 // =====================================================
-document.addEventListener("click", (e) => {
-  if (e.target.closest("[data-close]")) {
-    closeAllModals();
-  }
-});
-
-modals.forEach((modal) => {
-  modal.addEventListener("click", (e) => {
-    if (e.target === modal) closeAllModals();
-  });
-});
-
-document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape") closeAllModals();
-});
+// La lógica de cierre ahora está centralizada en modals.js
 
 // =====================================================
 // VIDEO + ACERVO
 // =====================================================
+window.VideoPlayer = {
+  initialize: function(currentCountry) {
+  // Esta función se llama DESPUÉS de que el modal de video se inyecta en el DOM
+  const videoTitle = document.querySelector("#modal-video .video-title");
+  const videoItems = Array.from(document.querySelectorAll("#modal-video .video-item"));
+  const filterButtons = Array.from(document.querySelectorAll("#modal-video .filter-chip"));
+
 function setActiveVideoItem(activeBtn) {
   videoItems.forEach((b) => b.classList.remove("active"));
   if (activeBtn) activeBtn.classList.add("active");
 }
 
 function setVideoSource(src, titleText) {
+  const videoPreview = document.getElementById("video-preview");
   if (!videoPreview) return;
 
   if (titleText && videoTitle) videoTitle.textContent = titleText;
@@ -543,12 +475,37 @@ if (videoItems.length) {
       setVideoSource(src, title);
     });
   });
-}
+  }
+
+  filterButtons.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      handleFilterClick(btn, filterButtons);
+    });
+  });
+
+  const singleSlider = document.getElementById("slide-single");
+  if (singleSlider) {
+    singleSlider.addEventListener("input", (e) => {
+      if (currentSingleFilter) applySingleFilter(currentSingleFilter, e.target.value);
+    });
+  }
+
+  const customSliders = document.querySelectorAll("#custom-filter-controls input[type='range']");
+  customSliders.forEach(slider => {
+    slider.addEventListener("input", applyCustomFilter);
+  });
+
+  updateVideoUIForCountry(currentCountry);
+  }
+};
 
 // =====================================================
 // FILTROS (FE)
 // =====================================================
+let currentSingleFilter = null;
+
 function ensureOverlay() {
+  const playerShell = document.querySelector("#modal-video .player-shell");
   if (!playerShell) return null;
 
   let overlay = playerShell.querySelector(".fx-overlay");
@@ -568,6 +525,7 @@ function ensureOverlay() {
 }
 
 function clearVisualFX() {
+  const videoPreview = document.getElementById("video-preview");
   if (videoPreview) {
     videoPreview.style.filter = "none";
   }
@@ -583,6 +541,7 @@ function clearVisualFX() {
 }
 
 function setOverlayPixel(intensity = 50) {
+  const videoPreview = document.getElementById("video-preview");
   if (videoPreview) {
     videoPreview.style.filter = "url(#pixelate-effect)";
     const morph = document.getElementById("pixel-morph");
@@ -605,12 +564,14 @@ function setOverlayThermal(intensity = 50) {
 }
 
 function setCssBlur(intensity = 50) {
+  const videoPreview = document.getElementById("video-preview");
   if (!videoPreview) return;
   const blurVal = (intensity / 100) * 8; // De 0px a 8px
   videoPreview.style.filter = `blur(${blurVal}px)`;
 }
 
 function setCssColorAdjust(intensity = 50) {
+  const videoPreview = document.getElementById("video-preview");
   if (!videoPreview) return;
   const sat = 1 + (intensity / 100) * 1.5; 
   const con = 1 + (intensity / 100) * 0.5; 
@@ -618,38 +579,20 @@ function setCssColorAdjust(intensity = 50) {
   videoPreview.style.filter = `saturate(${sat}) contrast(${con}) hue-rotate(${hue}deg)`;
 }
 
-let currentSingleFilter = null;
-function applySingleFilter(name, intensity) {
-  if (name === "blur") setCssBlur(intensity);
-  if (name === "color") setCssColorAdjust(intensity);
-  if (name === "pixel") setOverlayPixel(intensity);
-  if (name === "thermal") setOverlayThermal(intensity);
-}
-
-function applyCustomFilter() {
-  if (!videoPreview) return;
-  const blur = document.getElementById("slide-blur").value;
-  const contrast = document.getElementById("slide-contrast").value;
-  const saturate = document.getElementById("slide-saturate").value;
-  const brightness = document.getElementById("slide-brightness").value;
-  const hue = document.getElementById("slide-hue").value;
-
-  videoPreview.style.filter = `blur(${blur}px) contrast(${contrast}%) saturate(${saturate}%) brightness(${brightness}%) hue-rotate(${hue}deg)`;
-}
-
-function setActiveFilterButton(activeBtn) {
-  filterButtons.forEach((b) => b.classList.remove("active"));
-  if (activeBtn) activeBtn.classList.add("active");
-}
-
-filterButtons.forEach((btn) => {
-  btn.addEventListener("click", () => {
+function handleFilterClick(btn, filterButtons) {
     const name = btn.dataset.filter;
     const wasActive = btn.classList.contains("active");
 
     const customControls = document.getElementById("custom-filter-controls");
     const singleControl = document.getElementById("single-filter-control");
     const singleSlider = document.getElementById("slide-single");
+
+function applySingleFilter(name, intensity) {
+  if (name === "blur") setCssBlur(intensity);
+  if (name === "color") setCssColorAdjust(intensity);
+  if (name === "pixel") setOverlayPixel(intensity);
+  if (name === "thermal") setOverlayThermal(intensity);
+}
 
     if (wasActive) {
       setActiveFilterButton(null);
@@ -678,25 +621,30 @@ filterButtons.forEach((btn) => {
          applySingleFilter(name, 50);
       }
     }
-  });
-});
-
-// Listeners para la barra de intensidad única
-const singleSlider = document.getElementById("slide-single");
-if (singleSlider) {
-  singleSlider.addEventListener("input", (e) => {
-    if (currentSingleFilter) applySingleFilter(currentSingleFilter, e.target.value);
-  });
 }
 
-// Listeners para actualizar el filtro custom en tiempo real mientras mueves las barras
-const customSliders = document.querySelectorAll("#custom-filter-controls input[type='range']");
-customSliders.forEach(slider => {
-  slider.addEventListener("input", applyCustomFilter);
-});
+function applyCustomFilter() {
+  const videoPreview = document.getElementById("video-preview");
+  if (!videoPreview) return;
+  const blur = document.getElementById("slide-blur").value;
+  const contrast = document.getElementById("slide-contrast").value;
+  const saturate = document.getElementById("slide-saturate").value;
+  const brightness = document.getElementById("slide-brightness").value;
+  const hue = document.getElementById("slide-hue").value;
+
+  videoPreview.style.filter = `blur(${blur}px) contrast(${contrast}%) saturate(${saturate}%) brightness(${brightness}%) hue-rotate(${hue}deg)`;
+}
+
+function setActiveFilterButton(activeBtn) {
+  // Es posible que filterButtons no esté definido si el modal no se ha cargado.
+  const filterButtons = Array.from(document.querySelectorAll("#modal-video .filter-chip"));
+  filterButtons.forEach((b) => b.classList.remove("active"));
+  if (activeBtn) activeBtn.classList.add("active");
+}
 
 function updateVideoUIForCountry(country) {
   if (!country) return;
+  const videoTitle = document.querySelector("#modal-video .video-title");
   if (videoTitle) videoTitle.textContent = `Video oficial — ${country.name}`;
 }
 
@@ -852,7 +800,7 @@ if (!scene) {
       });
 
       entity.addEventListener("targetLost", () => {
-        const shouldPreserveUI = hasVisibleModal();
+        const shouldPreserveUI = window.ModalManager.isVisible();
 
         if (currentTargetEntity === entity) {
           if (!shouldPreserveUI) {
@@ -863,7 +811,7 @@ if (!scene) {
 
           if (!shouldPreserveUI) {
             hideHUD();
-            closeAllModals();
+            window.ModalManager.closeAll();
             setStatus("Apunta a una bandera...");
 
             stopBounce(ball);

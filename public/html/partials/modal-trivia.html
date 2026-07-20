@@ -1,0 +1,59 @@
+<div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="trivia-title">
+  <button class="modal-close" type="button" data-close aria-label="Cerrar">✕</button>
+
+  <!-- Header -->
+  <div class="trivia-head">
+    <div class="trivia-badge">🎮 Trivia (FE)</div>
+    <h2 id="trivia-title" class="trivia-title">Trivia — País detectado</h2>
+
+    <div class="trivia-meta" aria-label="Progreso y puntaje">
+      <div class="trivia-progress">
+        <span id="trivia-progress-text">Pregunta 1/5</span>
+        <div class="trivia-bar" aria-hidden="true">
+          <div id="trivia-bar-fill" class="trivia-bar-fill" style="width: 0%;"></div>
+        </div>
+      </div>
+
+      <div class="trivia-score">
+        <span class="trivia-score-label">Puntos</span>
+        <span id="trivia-score-value" class="trivia-score-value">0</span>
+      </div>
+    </div>
+
+    <p class="trivia-sub">
+      Responde 5 preguntas rápidas relacionadas con el país escaneado.
+    </p>
+  </div>
+
+  <!-- Body -->
+  <div class="trivia-body">
+    <div id="trivia-empty" class="trivia-empty hidden">
+      <p><strong>Escanea una bandera</strong> para iniciar la trivia.</p>
+      <p class="modal-note">Tip: apunta a cualquier target para desbloquear preguntas.</p>
+    </div>
+
+    <div id="trivia-qwrap" class="trivia-qwrap">
+      <div id="trivia-question" class="trivia-question">Cargando pregunta...</div>
+      <div id="trivia-answers" class="trivia-answers" role="group" aria-label="Opciones"></div>
+      <div id="trivia-feedback" class="trivia-feedback" aria-live="polite"></div>
+      <div class="trivia-actions">
+        <button id="trivia-next" class="primary-btn" type="button" disabled>Siguiente</button>
+        <button id="trivia-restart" class="secondary-btn" type="button">Jugar de nuevo</button>
+      </div>
+    </div>
+
+    <div id="trivia-result" class="trivia-result hidden" aria-live="polite">
+      <h3 class="trivia-result-title">Resultado</h3>
+      <p id="trivia-result-text" class="trivia-result-text">Obtuviste 0/5</p>
+      <div class="trivia-actions">
+        <button id="trivia-restart-2" class="primary-btn" type="button">Jugar de nuevo</button>
+        <button class="secondary-btn" type="button" data-close>Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="video-footer">
+    <small>Avance: trivia por país + puntaje + progreso (lista para conectar base de preguntas).</small>
+  </div>
+</div>
