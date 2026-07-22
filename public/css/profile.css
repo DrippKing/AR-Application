@@ -1,0 +1,290 @@
+/* ======================================================
+   WorldScan 2026 — Hoja de Estilos para Perfil (profile.css)
+   ====================================================== */
+
+/* ===============================
+   BASE Y VARIABLES (Consistente con home.css)
+   =============================== */
+:root {
+  --bg: #061018;
+  --bg-2: #0a1722;
+  --card: rgba(255, 255, 255, 0.08);
+  --stroke: rgba(255, 255, 255, 0.12);
+  --text: #eef6ff;
+  --muted: rgba(238, 246, 255, 0.74);
+  --green: #08b059;
+  --cyan: #00b1e8;
+  --blue: #203771;
+  --shadow: 0 18px 60px rgba(0, 0, 0, 0.35);
+  --radius: 24px;
+  --max: 1200px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  color: var(--text);
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background:
+    radial-gradient(circle at top left, rgba(0, 177, 232, 0.16), transparent 30%),
+    radial-gradient(circle at bottom right, rgba(8, 176, 89, 0.14), transparent 30%),
+    linear-gradient(180deg, var(--bg), var(--bg-2));
+  overflow-x: hidden;
+  position: relative;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+main {
+  padding: 24px 0;
+}
+
+/* ======================================================
+   ESTILOS COMUNES (de home.css)
+   ====================================================== */
+
+/* Elementos decorativos */
+.bg-grid, .bg-orb { z-index: 0; }
+.bg-grid {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.7), transparent 90%);
+}
+.bg-orb {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(50px);
+  pointer-events: none;
+}
+.orb-1 {
+  width: 280px; height: 280px; top: 8%; left: -60px;
+  background: rgba(0, 177, 232, 0.18);
+}
+.orb-2 {
+  width: 320px; height: 320px; bottom: 8%; right: -80px;
+  background: rgba(8, 176, 89, 0.14);
+}
+
+/* Topbar y Footer */
+.topbar, .footer {
+  position: relative;
+  z-index: 10;
+  width: min(var(--max), calc(100% - 32px));
+  margin: 18px auto 0;
+  padding: 16px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  border: 1px solid var(--stroke);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(14px);
+  box-shadow: var(--shadow);
+}
+.footer {
+  margin: 28px auto 26px;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.brand-ball {
+  width: 52px; height: 52px; object-fit: contain;
+  filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.32));
+}
+.brand-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1;
+}
+.brand-title {
+  font-size: 1.1rem; font-weight: 800; letter-spacing: .3px;
+}
+.brand-year {
+  font-size: .9rem; font-weight: 700; color: #92dfff; margin-top: 4px;
+}
+.topbar-btn {
+  padding: 12px 18px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.08));
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  font-weight: 700;
+  transition: .25s ease;
+}
+.topbar-btn:hover {
+  transform: translateY(-1px);
+  border-color: rgba(255, 255, 255, 0.22);
+}
+.footer p {
+  margin: 0; color: var(--muted);
+}
+.footer-link {
+  font-weight: 800; color: #a6eeff;
+}
+
+/* ======================================================
+   ESTILOS DE PERFIL (NUEVOS)
+   ====================================================== */
+
+.profile-section {
+  width: min(var(--max), calc(100% - 32px));
+  margin: 0 auto;
+}
+
+.profile-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--stroke);
+  border-radius: var(--radius);
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  backdrop-filter: blur(12px);
+  box-shadow: var(--shadow);
+}
+
+.profile-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.profile-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(8, 176, 89, 0.2), rgba(0, 177, 232, 0.22));
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  display: grid;
+  place-items: center;
+  font-size: 36px;
+  flex-shrink: 0;
+}
+
+.profile-info h2 {
+  margin: 0 0 6px;
+  font-size: clamp(1.5rem, 4vw, 1.8rem);
+}
+
+.profile-info p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.profile-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  padding-top: 24px;
+  border-top: 1px solid var(--stroke);
+}
+
+.stat-item {
+  background: rgba(255, 255, 255, 0.04);
+  padding: 18px;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.stat-item .label {
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-bottom: 8px;
+  display: block;
+}
+
+.stat-item .value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.profile-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+
+/* Botones consistentes con home.css */
+.primary-btn, .secondary-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 12px 20px;
+  border-radius: 999px;
+  font-weight: 700;
+  transition: .25s ease;
+  border: none;
+}
+
+.primary-btn {
+  background: linear-gradient(135deg, var(--green), var(--cyan));
+  color: white;
+  box-shadow: 0 10px 28px rgba(0, 177, 232, 0.18);
+}
+.primary-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 32px rgba(0, 177, 232, 0.25);
+}
+
+.secondary-btn {
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text);
+}
+.secondary-btn:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.24);
+}
+
+/* ======================================================
+   RESPONSIVE
+   ====================================================== */
+@media (max-width: 780px) {
+  .topbar, .footer {
+    padding: 14px 16px;
+  }
+  .brand-ball {
+    width: 46px; height: 46px;
+  }
+  .footer {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 520px) {
+  .topbar, .footer, .profile-section {
+    width: min(var(--max), calc(100% - 20px));
+  }
+  .profile-card {
+    padding: 22px;
+  }
+  .profile-header {
+    gap: 16px;
+  }
+  .profile-avatar {
+    width: 64px; height: 64px; font-size: 30px;
+  }
+  .profile-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
