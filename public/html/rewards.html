@@ -65,22 +65,22 @@
 
       <div class="field">
         <label for="cardName">Nombre en la tarjeta</label>
-        <input id="cardName" type="text" placeholder="Juan Pérez" />
+        <input id="cardName" type="text" placeholder="Juan Pérez" required />
       </div>
 
       <div class="field">
         <label for="cardNumber">Número de tarjeta</label>
-        <input id="cardNumber" type="text" placeholder="4242 4242 4242 4242" />
+        <input id="cardNumber" type="text" inputmode="numeric" placeholder="4242 4242 4242 4242" required />
       </div>
 
       <div class="field">
         <label for="cardExp">Fecha de expiración</label>
-        <input id="cardExp" type="text" placeholder="MM/AA" />
+        <input id="cardExp" type="text" placeholder="MM/AA" required />
       </div>
 
       <div class="field">
         <label for="cardCvv">CVV</label>
-        <input id="cardCvv" type="text" placeholder="123" />
+        <input id="cardCvv" type="text" inputmode="numeric" placeholder="123" required />
       </div>
 
       <div class="actions">
@@ -100,6 +100,12 @@
       const closePaymentModal = document.getElementById('closePaymentModal');
       const confirmPayment = document.getElementById('confirmPayment');
       const packs = document.querySelectorAll('.pack');
+      const cardFields = [
+        document.getElementById('cardName'),
+        document.getElementById('cardNumber'),
+        document.getElementById('cardExp'),
+        document.getElementById('cardCvv'),
+      ];
 
       let selectedPack = null;
       const userId = localStorage.getItem('worldscan_userId');
@@ -145,6 +151,14 @@
 
       confirmPayment.addEventListener('click', async () => {
         if (!selectedPack) return;
+
+        const missingCardField = cardFields.find((field) => !field?.value.trim());
+        if (missingCardField) {
+          missingCardField.focus();
+          alert('Agrega los datos de tu tarjeta antes de confirmar la compra.');
+          return;
+        }
+
         confirmPayment.disabled = true;
         confirmPayment.textContent = 'Procesando...';
 

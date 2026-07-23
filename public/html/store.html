@@ -108,8 +108,26 @@
         <div id="purchase-success" class="store-empty hidden"></div>
       </div>
       <div class="video-footer">
-        <button id="finalize-purchase-btn" class="primary-btn" type="button">Finalizar compra</button>
         <button class="secondary-btn" type="button" data-close>Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-coupon" class="modal hidden" aria-hidden="true">
+    <div class="modal-card store-modal coupon-modal" role="dialog" aria-modal="true" aria-labelledby="coupon-modal-title">
+      <button class="modal-close" type="button" data-close aria-label="Cerrar">✕</button>
+      <div class="modal-head">
+        <h2 id="coupon-modal-title">Cupón de tienda</h2>
+        <p id="coupon-modal-details"></p>
+      </div>
+      <div class="coupon-code-box">
+        <span>Código de descuento</span>
+        <strong id="coupon-code"></strong>
+      </div>
+      <p class="coupon-warning">Advertencia: este código no estará activo hasta finalizar la compra.</p>
+      <div class="video-footer">
+        <button id="add-coupon-to-cart-btn" class="primary-btn" type="button">Agregar al carrito</button>
+        <button class="secondary-btn" type="button" data-close>Entendido</button>
       </div>
     </div>
   </div>

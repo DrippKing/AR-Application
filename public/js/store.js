@@ -1,33 +1,28 @@
 const cart = [];
 let currentProduct = null;
 let currentProducts = [];
-
-function createTemplateCards(count) {
-  return Array.from({ length: count }, () => `
-    <article class="store-card store-template-card">
-      <div class="store-template-slot" aria-hidden="true"></div>
-    </article>
-  `).join('');
-}
+let selectedCoupon = null;
+const generatedCouponCodes = new Set();
 
 function createThermoCards() {
   const thermos = [
-    ['thermo_1.png', 'Termo Azul Marino'],
-    ['thermo_2.png', 'Termo Azul Brillante'],
-    ['thermo_3.png', 'Termo Rojo'],
-    ['thermo_4.png', 'Termo Blanco y Crema'],
-    ['thermo_5.png', 'Termo Rosa'],
-    ['thermo_6.png', 'Termo Negro Deportivo'],
-    ['thermo_7.png', 'Termo Negro y Naranja'],
-    ['thermo_8.png', 'Termo Azul Deportivo'],
+    ['thermo_1.png', 'Termo negro mate'],
+    ['thermo_2.png', 'Termo gris grafito'],
+    ['thermo_3.png', 'Termo negro ajedrezado'],
+    ['thermo_4.png', 'Termo negro con detalle naranja'],
+    ['thermo_5.png', 'Termo blanco multicolor'],
+    ['thermo_6.png', 'Termo negro con tapa plateada'],
+    ['thermo_7.png', 'Termo negro y naranja'],
+    ['thermo_8.png', 'Termo azul y blanco'],
   ];
 
-  return thermos.map(([image, name]) => `
+  return thermos.map(([image, name], index) => `
     <article class="store-card store-thermo-card">
       <h3>${name}</h3>
-      <button type="button" class="store-image store-product-btn" data-product-type="termo" data-product-name="${name}" data-product-image="/assets/thermos/${image}">
+      <button type="button" class="store-image store-product-btn" data-product-type="termo" data-product-name="${name}" data-product-image="/assets/thermos/${image}" data-product-price="${2400 + (index * 150)}">
         <img src="/assets/thermos/${image}" alt="${name}" />
       </button>
+      <div class="store-price">${formatPrice(2400 + (index * 150))}</div>
     </article>
   `).join('');
 }
@@ -46,14 +41,41 @@ function createBallCards() {
     ['ball_10.png', 'Balón Naranja Azul y Negro'],
   ];
 
-  return balls.map(([image, name]) => `
+  return balls.map(([image, name], index) => `
     <article class="store-card store-ball-card">
       <h3>${name}</h3>
-      <button type="button" class="store-image store-product-btn" data-product-type="balon" data-product-name="${name}" data-product-image="/assets/balls/${image}">
+      <button type="button" class="store-image store-product-btn" data-product-type="balon" data-product-name="${name}" data-product-image="/assets/balls/${image}" data-product-price="${4200 + (index * 150)}">
         <img src="/assets/balls/${image}" alt="${name}" />
       </button>
+      <div class="store-price">${formatPrice(4200 + (index * 150))}</div>
     </article>
   `).join('');
+}
+
+function createCouponCards(topJerseyPrices) {
+  const coupons = [
+    ['adidas.png', 'Adidas', 'Tennis y jerseys', 10, topJerseyPrices[0]],
+    ['nike.png', 'Nike', 'Balones y tenis', 15, topJerseyPrices[1]],
+    ['puma.png', 'Pumas', 'Jerseys y accesorios', 20, topJerseyPrices[2]],
+    ['adidas.png', 'Adidas', 'Selección de jerseys', 25, topJerseyPrices[0]],
+  ];
+
+  return coupons.map(([image, store, products, discount, price]) => {
+    const imagePath = `/assets/cupones/${image}`;
+    return `
+      <article class="store-card store-coupon-card coupon-card-btn" tabindex="0" role="button" data-coupon-store="${store}" data-coupon-products="${products}" data-coupon-discount="${discount}" data-coupon-price="${price}" data-coupon-image="${imagePath}">
+        <div class="store-coupon-badge">-${discount}%</div>
+        <div class="store-image store-coupon-image">
+          <img src="${imagePath}" alt="Cupón del ${discount}% en ${store}" />
+        </div>
+        <div class="store-coupon-content">
+          <h3>${store}</h3>
+          <p>${products} · descuento de ${discount}%</p>
+          <div class="store-price">${formatPrice(price)}</div>
+        </div>
+      </article>
+    `;
+  }).join('');
 }
 
 async function loadStoreProducts() {
@@ -75,6 +97,10 @@ async function loadStoreProducts() {
       ...pais,
       precio: jerseyPrices[pais.codigo] ?? 0,
     }));
+    const topJerseyPrices = currentProducts
+      .map((pais) => pais.precio)
+      .sort((firstPrice, secondPrice) => secondPrice - firstPrice)
+      .slice(0, 3);
 
     const cards = currentProducts.map((pais, index) => {
       return `
@@ -108,8 +134,8 @@ async function loadStoreProducts() {
         <div class="store-grid">${createThermoCards()}</div>
       </section>
       <section class="store-category-view hidden" data-category-view="cupones">
-        <div class="store-summary">Plantillas para agregar cupones.</div>
-        <div class="store-grid">${createTemplateCards(6)}</div>
+        <div class="store-summary">Cupones de tiendas participantes del 10% al 25%.</div>
+        <div class="store-grid">${createCouponCards(topJerseyPrices)}</div>
       </section>
     `;
 
@@ -125,9 +151,9 @@ function setupStoreEvents() {
   const cartModal = document.getElementById('modal-cart');
   const cartOpenBtn = document.getElementById('cart-open-btn');
   const addToCartBtn = document.getElementById('add-to-cart-btn');
-  const finalizeBtn = document.getElementById('finalize-purchase-btn');
   const continueBtn = document.getElementById('continue-checkout-btn');
   const confirmBtn = document.getElementById('confirm-purchase-btn');
+  const addCouponToCartBtn = document.getElementById('add-coupon-to-cart-btn');
   const jerseyNameInput = document.getElementById('jersey-name');
   const closeButtons = Array.from(document.querySelectorAll('[data-close]'));
 
@@ -166,9 +192,43 @@ function setupStoreEvents() {
         type: button.dataset.productType,
         nombre: button.dataset.productName,
         image: button.dataset.productImage,
-        price: 0,
+        price: Number(button.dataset.productPrice),
       });
     });
+  });
+
+  document.querySelectorAll('.coupon-card-btn').forEach((card) => {
+    const openCoupon = () => openCouponModal({
+      store: card.dataset.couponStore,
+      products: card.dataset.couponProducts,
+      discount: card.dataset.couponDiscount,
+      price: card.dataset.couponPrice,
+      image: card.dataset.couponImage,
+    });
+
+    card.addEventListener('click', openCoupon);
+    card.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        openCoupon();
+      }
+    });
+  });
+
+  addCouponToCartBtn?.addEventListener('click', () => {
+    if (!selectedCoupon) return;
+
+    cart.push({
+      name: `Cupón ${selectedCoupon.store} - ${selectedCoupon.discount}%`,
+      price: Number(selectedCoupon.price) || 0,
+      quantity: 1,
+      image: selectedCoupon.image,
+      couponCode: selectedCoupon.code,
+    });
+
+    closeModal(document.getElementById('modal-coupon'));
+    openModal(cartModal);
+    renderCart();
   });
 
   cartOpenBtn?.addEventListener('click', () => {
@@ -197,12 +257,6 @@ function setupStoreEvents() {
     closeModal(sizeModal);
     openModal(cartModal);
     renderCart();
-  });
-
-  finalizeBtn?.addEventListener('click', () => {
-    openModal(cartModal);
-    renderCart();
-    showCheckoutStep();
   });
 
   continueBtn?.addEventListener('click', () => {
@@ -253,7 +307,7 @@ function openProductModal(product) {
   if (!sizeModal || !modalTitle || !modalDescription || !productName || !productPrice || !productImg) return;
 
   productName.textContent = currentProduct.nombre;
-  productPrice.textContent = currentProduct.type === 'jersey' ? formatPrice(currentProduct.price) : 'Precio por definir';
+  productPrice.textContent = formatPrice(currentProduct.price);
   productImg.src = currentProduct.image;
   productImg.alt = currentProduct.nombre;
   modalTitle.textContent = currentProduct.type === 'jersey' ? 'Personaliza tu jersey' : 'Agrega un producto';
@@ -266,6 +320,47 @@ function openProductModal(product) {
   if (quantityInput) quantityInput.value = '1';
 
   openModal(sizeModal);
+}
+
+function openCouponModal(coupon) {
+  selectedCoupon = {
+    ...coupon,
+    code: generateCouponCode(),
+  };
+  const couponModal = document.getElementById('modal-coupon');
+  const couponTitle = document.getElementById('coupon-modal-title');
+  const couponDetails = document.getElementById('coupon-modal-details');
+  const couponCode = document.getElementById('coupon-code');
+
+  if (!couponModal || !couponTitle || !couponDetails || !couponCode) return;
+
+  couponTitle.textContent = `Cupón ${selectedCoupon.store}`;
+  couponDetails.textContent = `${selectedCoupon.products} con ${selectedCoupon.discount}% de descuento por ${formatPrice(selectedCoupon.price)}.`;
+  couponCode.textContent = selectedCoupon.code;
+  openModal(couponModal);
+}
+
+function generateCouponCode() {
+  const userId = localStorage.getItem('worldscan_userId') || 'guest';
+  const storageKey = `worldscan_coupon_codes_${userId}`;
+  let usedCodes = [];
+
+  try {
+    usedCodes = JSON.parse(localStorage.getItem(storageKey) || '[]');
+  } catch (error) {
+    usedCodes = [];
+  }
+
+  const usedCodeSet = new Set(usedCodes);
+  let code = '';
+  do {
+    code = String(Math.floor(1000000000000000 + Math.random() * 9000000000000000));
+  } while (usedCodeSet.has(code) || generatedCouponCodes.has(code));
+
+  usedCodes.push(code);
+  generatedCouponCodes.add(code);
+  localStorage.setItem(storageKey, JSON.stringify(usedCodes));
+  return code;
 }
 
 function openModal(modal) {
@@ -324,6 +419,7 @@ function renderCart() {
         <strong>${item.name}</strong>
         <p>Unidades: ${quantity}</p>
         ${item.size ? `<p>Talla: ${item.size}</p>` : ''}
+        ${item.couponCode ? `<p>Código: <strong>${item.couponCode}</strong></p>` : ''}
         <p>${formatPrice(item.price * quantity)}</p>
       </div>
       <button class="secondary-btn cart-remove-btn" type="button" data-index="${index}">Eliminar</button>
@@ -369,6 +465,12 @@ function confirmPurchase() {
   const shippingForm = document.getElementById('shipping-form');
   const cartTotalRow = document.getElementById('cart-total-row');
   const checkoutStep = document.getElementById('checkout-step');
+  const couponCodes = cart
+    .filter((item) => item.couponCode)
+    .map((item) => item.couponCode);
+  const couponMessage = couponCodes.length > 0
+    ? ` Códigos activados para canjearlos en tiendas participantes: ${couponCodes.join(', ')}.`
+    : '';
 
   if (!name || !address || !city || !state || !zip || !phone) {
     alert('Por favor completa todos los campos de envío.');
@@ -378,13 +480,14 @@ function confirmPurchase() {
   const total = cart.reduce((sum, item) => sum + (item.price * (item.quantity || 1)), 0);
   if (purchaseSuccess) {
     purchaseSuccess.classList.remove('hidden');
-    purchaseSuccess.textContent = `Compra confirmada. Total pagado: ${formatPrice(total)}. Envío a: ${name}, ${address}, ${city}, ${state}, ${zip}.`;
+    purchaseSuccess.textContent = `Compra confirmada. Total pagado: ${formatPrice(total)}. Envío a: ${name}, ${address}, ${city}, ${state}, ${zip}.${couponMessage}`;
   }
 
   if (shippingForm) shippingForm.classList.add('hidden');
   if (cartTotalRow) cartTotalRow.classList.add('hidden');
   if (checkoutStep) checkoutStep.classList.add('hidden');
   cart.length = 0;
+  selectedCoupon = null;
 }
 
 function formatPrice(value) {

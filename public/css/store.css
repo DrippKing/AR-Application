@@ -297,17 +297,6 @@ body.no-scroll{
   box-shadow:0 0 0 3px rgba(8,176,89,0.18);
 }
 
-.store-template-card{
-  min-height:260px;
-}
-
-.store-template-slot{
-  flex:1;
-  min-height:258px;
-  background:rgba(0,0,0,0.10);
-  border:1px dashed rgba(255,255,255,0.16);
-}
-
 .store-ball-card .store-image{
   min-height:0;
   padding:14px;
@@ -326,6 +315,94 @@ body.no-scroll{
 
 .store-thermo-card .store-image img{
   object-fit:contain;
+}
+
+.store-coupon-card{
+  position:relative;
+  cursor:pointer;
+}
+
+.store-coupon-card:focus-visible{
+  outline:3px solid rgba(242,201,76,0.85);
+  outline-offset:3px;
+}
+
+.store-coupon-badge{
+  position:absolute;
+  top:12px;
+  right:12px;
+  z-index:1;
+  padding:8px 10px;
+  border-radius:10px;
+  background:#f2c94c;
+  color:#181a18;
+  font-size:14px;
+  font-weight:800;
+}
+
+.store-coupon-image{
+  aspect-ratio:4 / 3;
+  padding:18px;
+  background:rgba(0,0,0,0.1);
+}
+
+.store-coupon-image img{
+  object-fit:contain;
+}
+
+.store-coupon-content{
+  display:flex;
+  flex:1;
+  flex-direction:column;
+  gap:8px;
+  padding:14px 16px 16px;
+  text-align:center;
+}
+
+.store-coupon-content h3{
+  padding:0;
+}
+
+.store-coupon-content p{
+  margin:0;
+  color:rgba(255,255,255,0.75);
+  font-size:14px;
+}
+
+.coupon-modal{
+  width:min(94vw, 560px);
+}
+
+.coupon-code-box{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  margin:20px 0 14px;
+  padding:18px;
+  border:1px solid rgba(242,201,76,0.55);
+  border-radius:14px;
+  background:rgba(242,201,76,0.1);
+  text-align:center;
+}
+
+.coupon-code-box span{
+  color:rgba(255,255,255,0.72);
+  font-size:12px;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+}
+
+.coupon-code-box strong{
+  color:#f2c94c;
+  font-size:clamp(20px, 5vw, 30px);
+  letter-spacing:.08em;
+  overflow-wrap:anywhere;
+}
+
+.coupon-warning{
+  margin:0 0 8px;
+  color:#ffd98a;
+  font-weight:700;
 }
 
 @media (prefers-reduced-motion: reduce){
