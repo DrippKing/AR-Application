@@ -400,7 +400,7 @@ function showCheckoutForm() {
   shippingForm.classList.remove('hidden');
 }
 
-function confirmPurchase() {
+async function confirmPurchase() {
   const name = document.getElementById('shipping-name').value.trim();
   const address = document.getElementById('shipping-address').value.trim();
   const city = document.getElementById('shipping-city').value.trim();
@@ -411,6 +411,7 @@ function confirmPurchase() {
   const shippingForm = document.getElementById('shipping-form');
   const cartTotalRow = document.getElementById('cart-total-row');
   const checkoutStep = document.getElementById('checkout-step');
+  const confirmBtn = document.getElementById('confirm-purchase-btn');
   const couponCodes = cart
     .filter((item) => item.couponCode)
     .map((item) => item.couponCode);
@@ -423,17 +424,59 @@ function confirmPurchase() {
     return;
   }
 
-  const total = cart.reduce((sum, item) => sum + (item.price * (item.quantity || 1)), 0);
-  if (purchaseSuccess) {
-    purchaseSuccess.classList.remove('hidden');
-    purchaseSuccess.textContent = `Compra confirmada. Total pagado: ${formatPrice(total)}. Envío a: ${name}, ${address}, ${city}, ${state}, ${zip}.${couponMessage}`;
+  const userId = localStorage.getItem('worldscan_userId');
+  if (!userId) {
+    alert('Error: No se encontró sesión de usuario. Por favor, inicia sesión de nuevo.');
+    return;
   }
 
-  if (shippingForm) shippingForm.classList.add('hidden');
-  if (cartTotalRow) cartTotalRow.classList.add('hidden');
-  if (checkoutStep) checkoutStep.classList.add('hidden');
-  cart.length = 0;
-  selectedCoupon = null;
+  confirmBtn.disabled = true;
+  confirmBtn.textContent = 'Verificando saldo...';
+
+  try {
+    const totalCost = cart.reduce((sum, item) => sum + (item.price * (item.quantity || 1)), 0);
+
+    // 1. Verificar el saldo del usuario ANTES de intentar la compra
+    const userResponse = await fetch(`/api/user/${userId}`);
+    const userData = await userResponse.json();
+
+    if (!userData.success || userData.user.points < totalCost) {
+      if (confirm("No tienes suficientes puntos para esta compra. ¿Deseas agregar más puntos a tu cuenta?")) {
+        window.location.href = '/rewards';
+      }
+      // Si el usuario cancela, simplemente se re-habilita el botón.
+      confirmBtn.disabled = false;
+      confirmBtn.textContent = 'Confirmar compra';
+      return;
+    }
+
+    // 2. Si hay saldo suficiente, proceder con la compra
+    confirmBtn.textContent = 'Procesando...';
+    const purchaseResponse = await fetch('/api/user/purchase', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId, totalCost }),
+    });
+    const purchaseData = await purchaseResponse.json();
+
+    if (purchaseData.success) {
+      purchaseSuccess.innerHTML = `<h3>¡Gracias por tu compra!</h3><p>Tu pedido ha sido procesado. Tu nuevo saldo de puntos es <strong>${purchaseData.user.Points.toLocaleString()}</strong>.${couponMessage}</p>`;
+      purchaseSuccess.classList.remove('hidden');
+      if (shippingForm) shippingForm.classList.add('hidden');
+      if (cartTotalRow) cartTotalRow.classList.add('hidden');
+      if (checkoutStep) checkoutStep.classList.add('hidden');
+      cart.length = 0;
+      selectedCoupon = null;
+    } else {
+      alert(`Error en la compra: ${purchaseData.message}`);
+    }
+  } catch (error) {
+    alert('Error de conexión al procesar la compra.');
+  } finally {
+    // Se re-habilita el botón en caso de error o si el usuario cancela el pop-up.
+    confirmBtn.disabled = false;
+    confirmBtn.textContent = 'Confirmar compra';
+  }
 }
 
 function formatPrice(value) {

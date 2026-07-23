@@ -97,6 +97,10 @@ app.get(['/login', '/login.html'], (req, res) => {
     sendHtmlPage(res, 'login');
 });
 
+app.get(['/register', '/register.html'], (req, res) => {
+    sendHtmlPage(res, 'register');
+});
+
 app.get('/html', (req, res) => {
     res.redirect('/home');
 });
@@ -168,6 +172,37 @@ app.get('/api/user/:id', (req, res) => {
     res.json({ success: true, user: { id: user.id, nombre: user.nombre, correo: user.correo, points: user.Points } });
 });
 
+// Endpoint para registrar un nuevo usuario
+app.post('/api/register', (req, res) => {
+    const { nombre, correo, password } = req.body;
+
+    if (!nombre || !correo || !password) {
+        return res.status(400).json({ success: false, message: 'Todos los campos son requeridos.' });
+    }
+
+    // Verificar si el correo ya existe
+    const emailExists = db.usuarios.some(u => u.correo.toLowerCase() === correo.toLowerCase());
+    if (emailExists) {
+        return res.status(409).json({ success: false, message: 'El correo electrónico ya está registrado.' });
+    }
+
+    // Crear nuevo usuario
+    const newId = db.usuarios.length > 0 ? Math.max(...db.usuarios.map(u => u.id)) + 1 : 1;
+    const newUser = {
+        id: newId,
+        nombre,
+        correo,
+        password, // En una app real, esto debería estar hasheado
+        Points: 0,
+        paises_escaneados: []
+    };
+
+    db.usuarios.push(newUser);
+    fs.writeFileSync(dbPath, JSON.stringify(db, null, 2), 'utf8');
+
+    res.status(201).json({ success: true, message: 'Usuario registrado con éxito.' });
+});
+
 // Endpoint para añadir puntos a un usuario
 app.post('/api/user/add-points', (req, res) => {
     const { userId, pointsToAdd } = req.body;
@@ -191,6 +226,34 @@ app.post('/api/user/add-points', (req, res) => {
     // Devolver el usuario actualizado (sin la contraseña)
     const { password, ...userWithoutPassword } = db.usuarios[userIndex];
     res.json({ success: true, user: userWithoutPassword });
+});
+
+// Endpoint para procesar una compra y restar puntos
+app.post('/api/user/purchase', (req, res) => {
+    const { userId, totalCost } = req.body;
+
+    if (!userId || totalCost === undefined) {
+        return res.status(400).json({ success: false, message: 'Se requiere ID de usuario y costo total.' });
+    }
+
+    const userIndex = db.usuarios.findIndex(u => u.id === parseInt(userId, 10));
+
+    if (userIndex === -1) {
+        return res.status(404).json({ success: false, message: 'Usuario no encontrado.' });
+    }
+
+    const cost = parseInt(totalCost, 10);
+    if (db.usuarios[userIndex].Points < cost) {
+        return res.status(402).json({ success: false, message: 'Puntos insuficientes para realizar la compra.' });
+    }
+
+    // Restar los puntos
+    db.usuarios[userIndex].Points -= cost;
+
+    fs.writeFileSync(dbPath, JSON.stringify(db, null, 2), 'utf8');
+
+    const { password, ...userWithoutPassword } = db.usuarios[userIndex];
+    res.json({ success: true, message: 'Compra realizada con éxito.', user: userWithoutPassword });
 });
 
 app.listen(port, () => {

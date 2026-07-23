@@ -42,7 +42,8 @@ body {
   color: var(--text);
   font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   background: #181a18; /* Fallback */
-  overflow-x: hidden;
+  overflow-x: hidden; /* Evita el scroll horizontal */
+  overflow-y: auto;   /* Permite el scroll vertical, anulando el 'hidden' de scanner.css */
   position: relative;
   background:
     radial-gradient(circle at top left, rgba(0, 177, 232, 0.16), transparent 30%),
@@ -139,13 +140,6 @@ a {
   align-items: center;
   gap: 14px;
   min-width: 0;
-}
-
-.brand-ball {
-  width: 52px;
-  height: 52px;
-  object-fit: contain;
-  filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.32));
 }
 
 .brand-text {
@@ -614,10 +608,7 @@ a {
   .topbar {
     padding: 14px 16px;
   }
-  .brand-ball {
-    width: 46px;
-    height: 46px;
-  }
+
   .topbar-btn {
     padding: 10px 14px;
     font-size: .95rem;

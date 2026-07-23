@@ -281,7 +281,7 @@
       "nombre": "Christian Dripp",
       "correo": "christiansalazar2005@gmail.com",
       "password": "5545",
-      "Points": 4870
+      "Points": 7270
     },
     {
       "id": 3,
@@ -303,6 +303,14 @@
       "correo": "pedro.lopez@example.com",
       "password": "password112",
       "Points": 0
+    },
+    {
+      "id": 6,
+      "nombre": "Hector Eduardo",
+      "correo": "hectoreduardo@gmail.com",
+      "password": "0000",
+      "Points": 2900,
+      "paises_escaneados": []
     }
   ]
 }
