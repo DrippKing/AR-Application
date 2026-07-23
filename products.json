@@ -1,0 +1,42 @@
+{
+  "jerseys": [
+    { "id": 1, "tag": "Jersey", "nombre": "México", "codigo": "MEX", "precio": 7900, "imagen": "/assets/jerseys/MEX.png" },
+    { "id": 2, "tag": "Jersey", "nombre": "Colombia", "codigo": "COL", "precio": 11300, "imagen": "/assets/jerseys/COL.png" },
+    { "id": 3, "tag": "Jersey", "nombre": "Japón", "codigo": "JPN", "precio": 13000, "imagen": "/assets/jerseys/JPN.png" },
+    { "id": 4, "tag": "Jersey", "nombre": "España", "codigo": "ESP", "precio": 6200, "imagen": "/assets/jerseys/ESP.png" },
+    { "id": 5, "tag": "Jersey", "nombre": "Corea del Sur", "codigo": "KOR", "precio": 14700, "imagen": "/assets/jerseys/KOR.png" },
+    { "id": 6, "tag": "Jersey", "nombre": "Países Bajos", "codigo": "NED", "precio": 4500, "imagen": "/assets/jerseys/NED.png" },
+    { "id": 7, "tag": "Jersey", "nombre": "Sudáfrica", "codigo": "RSA", "precio": 16500, "imagen": "/assets/jerseys/RSA.png" },
+    { "id": 8, "tag": "Jersey", "nombre": "Túnez", "codigo": "TUN", "precio": 15600, "imagen": "/assets/jerseys/TUN.png" },
+    { "id": 9, "tag": "Jersey", "nombre": "Uruguay", "codigo": "URU", "precio": 9600, "imagen": "/assets/jerseys/URU.png" },
+    { "id": 10, "tag": "Jersey", "nombre": "Uzbekistán", "codigo": "UZB", "precio": 17300, "imagen": "/assets/jerseys/UZB.png" }
+  ],
+  "balones": [
+    { "id": 11, "tag": "Balon", "nombre": "Balón Blanco Azul y Rojo", "imagen": "/assets/balls/ball_1.png", "precio": 4200 },
+    { "id": 12, "tag": "Balon", "nombre": "Balón Blanco y Negro", "imagen": "/assets/balls/ball_2.png", "precio": 4350 },
+    { "id": 13, "tag": "Balon", "nombre": "Balón Azul y Blanco", "imagen": "/assets/balls/ball_3.png", "precio": 4500 },
+    { "id": 14, "tag": "Balon", "nombre": "Balón Azul Intenso", "imagen": "/assets/balls/ball_4.png", "precio": 4650 },
+    { "id": 15, "tag": "Balon", "nombre": "Balón Blanco Azul y Rojo II", "imagen": "/assets/balls/ball_5.png", "precio": 4800 },
+    { "id": 16, "tag": "Balon", "nombre": "Balón Multicolor", "imagen": "/assets/balls/ball_6.png", "precio": 4950 },
+    { "id": 17, "tag": "Balon", "nombre": "Balón Blanco Azul y Negro", "imagen": "/assets/balls/ball_7.png", "precio": 5100 },
+    { "id": 18, "tag": "Balon", "nombre": "Balón Blanco Rojo y Negro", "imagen": "/assets/balls/ball_8.png", "precio": 5250 },
+    { "id": 19, "tag": "Balon", "nombre": "Balón Blanco Rojo y Azul", "imagen": "/assets/balls/ball_9.png", "precio": 5400 },
+    { "id": 20, "tag": "Balon", "nombre": "Balón Naranja Azul y Negro", "imagen": "/assets/balls/ball_10.png", "precio": 5550 }
+  ],
+  "termos": [
+    { "id": 21, "tag": "Termo", "nombre": "Termo negro mate", "imagen": "/assets/thermos/thermo_1.png", "precio": 2400 },
+    { "id": 22, "tag": "Termo", "nombre": "Termo gris grafito", "imagen": "/assets/thermos/thermo_2.png", "precio": 2550 },
+    { "id": 23, "tag": "Termo", "nombre": "Termo negro ajedrezado", "imagen": "/assets/thermos/thermo_3.png", "precio": 2700 },
+    { "id": 24, "tag": "Termo", "nombre": "Termo negro con detalle naranja", "imagen": "/assets/thermos/thermo_4.png", "precio": 2850 },
+    { "id": 25, "tag": "Termo", "nombre": "Termo blanco multicolor", "imagen": "/assets/thermos/thermo_5.png", "precio": 3000 },
+    { "id": 26, "tag": "Termo", "nombre": "Termo negro con tapa plateada", "imagen": "/assets/thermos/thermo_6.png", "precio": 3150 },
+    { "id": 27, "tag": "Termo", "nombre": "Termo negro y naranja", "imagen": "/assets/thermos/thermo_7.png", "precio": 3300 },
+    { "id": 28, "tag": "Termo", "nombre": "Termo azul y blanco", "imagen": "/assets/thermos/thermo_8.png", "precio": 3450 }
+  ],
+  "cupones": [
+    { "id": 29, "tag": "Cupon", "tienda": "Adidas", "productos": "Tennis y jerseys", "descuento": 10, "precio": 13000, "imagen": "/assets/cupones/adidas.png" },
+    { "id": 30, "tag": "Cupon", "tienda": "Nike", "productos": "Balones y tenis", "descuento": 15, "precio": 14700, "imagen": "/assets/cupones/nike.png" },
+    { "id": 31, "tag": "Cupon", "tienda": "Pumas", "productos": "Jerseys y accesorios", "descuento": 20, "precio": 16500, "imagen": "/assets/cupones/puma.png" },
+    { "id": 32, "tag": "Cupon", "tienda": "Adidas", "productos": "Selección de jerseys", "descuento": 25, "precio": 13000, "imagen": "/assets/cupones/adidas.png" }
+  ]
+}

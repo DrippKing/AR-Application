@@ -2,7 +2,7 @@ const express = require('express');
 const path = require('path');
 const fs = require('fs');
 const app = express();
-const port = 3001;
+const port = 3000;
 const htmlDir = path.join(__dirname, 'public', 'html');
 
 function sendHtmlPage(res, pageName) {
@@ -26,6 +26,17 @@ try {
 } catch (error) {
     console.error('❌ Error al cargar database.json:', error.message);
     console.log('Asegúrate de que el archivo database.json existe en la raíz del proyecto.');
+}
+
+// Cargar products.json
+const productsPath = path.join(__dirname, 'products.json');
+let productsDb = { jerseys: [], balones: [], termos: [], cupones: [] };
+try {
+    const data = fs.readFileSync(productsPath, 'utf8');
+    productsDb = JSON.parse(data);
+    console.log('✅ Base de datos de productos JSON conectada exitosamente.');
+} catch (error) {
+    console.error('❌ Error al cargar products.json:', error.message);
 }
 
 // 2. Servir archivos estáticos (CSS, JS, Assets) desde la carpeta 'public'
@@ -114,9 +125,9 @@ app.get('/api/trivia/:codigo', (req, res) => {
     res.json(triviasDelPais);
 });
 
-// Obtener lista completa de países / productos para la tienda
-app.get('/api/paises', (req, res) => {
-    res.json(db.paises);
+// Obtener todos los productos de la tienda desde products.json
+app.get('/api/products', (req, res) => {
+    res.json(productsDb);
 });
 
 // Endpoint para autenticar usuarios
