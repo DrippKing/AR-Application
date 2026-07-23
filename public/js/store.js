@@ -1,78 +1,47 @@
 const cart = [];
 let currentProduct = null;
 let currentProducts = [];
+let allStoreProducts = {}; // Para almacenar todos los productos de products.json
 let selectedCoupon = null;
 const generatedCouponCodes = new Set();
 
-function createThermoCards() {
-  const thermos = [
-    ['thermo_1.png', 'Termo negro mate'],
-    ['thermo_2.png', 'Termo gris grafito'],
-    ['thermo_3.png', 'Termo negro ajedrezado'],
-    ['thermo_4.png', 'Termo negro con detalle naranja'],
-    ['thermo_5.png', 'Termo blanco multicolor'],
-    ['thermo_6.png', 'Termo negro con tapa plateada'],
-    ['thermo_7.png', 'Termo negro y naranja'],
-    ['thermo_8.png', 'Termo azul y blanco'],
-  ];
+function renderProducts(products, type) {
+  return products.map((product) => {
+    // Adaptar la visualización para cupones
+    if (type === 'cupones') {
+      return `
+        <article class="store-card store-coupon-card coupon-card-btn" tabindex="0" role="button" 
+          data-coupon-store="${product.tienda}" 
+          data-coupon-products="${product.productos}" 
+          data-coupon-discount="${product.descuento}" 
+          data-coupon-price="${product.precio}" 
+          data-coupon-image="${product.imagen}">
+          <div class="store-coupon-badge">-${product.descuento}%</div>
+          <div class="store-image store-coupon-image">
+            <img src="${product.imagen}" alt="Cupón del ${product.descuento}% en ${product.tienda}" />
+          </div>
+          <div class="store-coupon-content">
+            <h3>${product.tienda}</h3>
+            <p>${product.productos} · descuento de ${product.descuento}%</p>
+            <div class="store-price">${formatPrice(product.precio)}</div>
+          </div>
+        </article>
+      `;
+    }
 
-  return thermos.map(([image, name], index) => `
-    <article class="store-card store-thermo-card">
-      <h3>${name}</h3>
-      <button type="button" class="store-image store-product-btn" data-product-type="termo" data-product-name="${name}" data-product-image="/assets/thermos/${image}" data-product-price="${2400 + (index * 150)}">
-        <img src="/assets/thermos/${image}" alt="${name}" />
-      </button>
-      <div class="store-price">${formatPrice(2400 + (index * 150))}</div>
-    </article>
-  `).join('');
-}
-
-function createBallCards() {
-  const balls = [
-    ['ball_1.png', 'Balón Blanco Azul y Rojo'],
-    ['ball_2.png', 'Balón Blanco y Negro'],
-    ['ball_3.png', 'Balón Azul y Blanco'],
-    ['ball_4.png', 'Balón Azul Intenso'],
-    ['ball_5.png', 'Balón Blanco Azul y Rojo II'],
-    ['ball_6.png', 'Balón Multicolor'],
-    ['ball_7.png', 'Balón Blanco Azul y Negro'],
-    ['ball_8.png', 'Balón Blanco Rojo y Negro'],
-    ['ball_9.png', 'Balón Blanco Rojo y Azul'],
-    ['ball_10.png', 'Balón Naranja Azul y Negro'],
-  ];
-
-  return balls.map(([image, name], index) => `
-    <article class="store-card store-ball-card">
-      <h3>${name}</h3>
-      <button type="button" class="store-image store-product-btn" data-product-type="balon" data-product-name="${name}" data-product-image="/assets/balls/${image}" data-product-price="${4200 + (index * 150)}">
-        <img src="/assets/balls/${image}" alt="${name}" />
-      </button>
-      <div class="store-price">${formatPrice(4200 + (index * 150))}</div>
-    </article>
-  `).join('');
-}
-
-function createCouponCards(topJerseyPrices) {
-  const coupons = [
-    ['adidas.png', 'Adidas', 'Tennis y jerseys', 10, topJerseyPrices[0]],
-    ['nike.png', 'Nike', 'Balones y tenis', 15, topJerseyPrices[1]],
-    ['puma.png', 'Pumas', 'Jerseys y accesorios', 20, topJerseyPrices[2]],
-    ['adidas.png', 'Adidas', 'Selección de jerseys', 25, topJerseyPrices[0]],
-  ];
-
-  return coupons.map(([image, store, products, discount, price]) => {
-    const imagePath = `/assets/cupones/${image}`;
+    // Renderizado para productos normales (jerseys, balones, termos)
     return `
-      <article class="store-card store-coupon-card coupon-card-btn" tabindex="0" role="button" data-coupon-store="${store}" data-coupon-products="${products}" data-coupon-discount="${discount}" data-coupon-price="${price}" data-coupon-image="${imagePath}">
-        <div class="store-coupon-badge">-${discount}%</div>
-        <div class="store-image store-coupon-image">
-          <img src="${imagePath}" alt="Cupón del ${discount}% en ${store}" />
-        </div>
-        <div class="store-coupon-content">
-          <h3>${store}</h3>
-          <p>${products} · descuento de ${discount}%</p>
-          <div class="store-price">${formatPrice(price)}</div>
-        </div>
+      <article class="store-card">
+        <h3>${product.nombre}</h3>
+        <button type="button" class="store-image store-product-btn" 
+          data-product-type="${product.tag.toLowerCase()}" 
+          data-product-name="${product.nombre}" 
+          data-product-image="${product.imagen}" 
+          data-product-price="${product.precio}"
+          data-product-code="${product.codigo || ''}">
+          <img src="${product.imagen}" alt="${product.nombre}" />
+        </button>
+        <div class="store-price">${formatPrice(product.precio)}</div>
       </article>
     `;
   }).join('');
@@ -85,34 +54,13 @@ async function loadStoreProducts() {
   storeContent.innerHTML = '<div class="store-loading">Cargando productos...</div>';
 
   try {
-    const response = await fetch('/api/paises');
+    const response = await fetch('/api/products'); // Nuevo endpoint
     if (!response.ok) throw new Error('No se pudieron cargar los productos');
 
-    const paises = await response.json();
-    const pricesResponse = await fetch('/jerseys.json');
-    if (!pricesResponse.ok) throw new Error('No se pudieron cargar los precios de jerseys');
-    const jerseyPrices = await pricesResponse.json();
+    allStoreProducts = await response.json(); // Guardamos todos los productos
 
-    currentProducts = paises.map((pais) => ({
-      ...pais,
-      precio: jerseyPrices[pais.codigo] ?? 0,
-    }));
-    const topJerseyPrices = currentProducts
-      .map((pais) => pais.precio)
-      .sort((firstPrice, secondPrice) => secondPrice - firstPrice)
-      .slice(0, 3);
-
-    const cards = currentProducts.map((pais, index) => {
-      return `
-        <article class="store-card">
-          <h3>${pais.nombre}</h3>
-          <button type="button" class="store-image store-image-btn" data-index="${index}">
-            <img src="${getStoreImage(pais.codigo)}" alt="${pais.nombre}" />
-          </button>
-          <div class="store-price">${formatPrice(pais.precio)}</div>
-        </article>
-      `;
-    }).join('');
+    // currentProducts ahora será la lista de jerseys por defecto
+    currentProducts = allStoreProducts.jerseys;
 
     storeContent.innerHTML = `
       <nav class="store-categories" aria-label="Categorías de la tienda">
@@ -122,20 +70,20 @@ async function loadStoreProducts() {
         <button class="store-category-btn" type="button" data-category="cupones" aria-pressed="false">Cupones</button>
       </nav>
       <section class="store-category-view" data-category-view="jerseys">
-        <div class="store-summary">Mostrando ${paises.length} productos del Mundial 2026.</div>
-        <div class="store-grid">${cards}</div>
+        <div class="store-summary">Mostrando ${allStoreProducts.jerseys.length} jerseys disponibles.</div>
+        <div class="store-grid">${renderProducts(allStoreProducts.jerseys, 'jersey')}</div>
       </section>
       <section class="store-category-view hidden" data-category-view="balones">
-        <div class="store-summary">Mostrando 10 balones disponibles.</div>
-        <div class="store-grid">${createBallCards()}</div>
+        <div class="store-summary">Mostrando ${allStoreProducts.balones.length} balones disponibles.</div>
+        <div class="store-grid">${renderProducts(allStoreProducts.balones, 'balon')}</div>
       </section>
       <section class="store-category-view hidden" data-category-view="termos">
-        <div class="store-summary">Mostrando 8 termos disponibles.</div>
-        <div class="store-grid">${createThermoCards()}</div>
+        <div class="store-summary">Mostrando ${allStoreProducts.termos.length} termos disponibles.</div>
+        <div class="store-grid">${renderProducts(allStoreProducts.termos, 'termo')}</div>
       </section>
       <section class="store-category-view hidden" data-category-view="cupones">
-        <div class="store-summary">Cupones de tiendas participantes del 10% al 25%.</div>
-        <div class="store-grid">${createCouponCards(topJerseyPrices)}</div>
+        <div class="store-summary">Cupones de tiendas participantes.</div>
+        <div class="store-grid">${renderProducts(allStoreProducts.cupones, 'cupones')}</div>
       </section>
     `;
 
@@ -167,6 +115,9 @@ function setupStoreEvents() {
     button.addEventListener('click', () => {
       const category = button.dataset.category;
 
+      // Actualizar currentProducts para la categoría activa
+      currentProducts = allStoreProducts[category];
+
       document.querySelectorAll('.store-category-btn').forEach((categoryButton) => {
         const isActive = categoryButton === button;
         categoryButton.classList.toggle('is-active', isActive);
@@ -179,20 +130,15 @@ function setupStoreEvents() {
     });
   });
 
-  document.querySelectorAll('.store-image-btn').forEach((button) => {
-    button.addEventListener('click', () => {
-      const index = Number(button.dataset.index);
-      openSizeModal(currentProducts[index], index);
-    });
-  });
-
   document.querySelectorAll('.store-product-btn').forEach((button) => {
-    button.addEventListener('click', () => {
-      openProductModal({
-        type: button.dataset.productType,
-        nombre: button.dataset.productName,
-        image: button.dataset.productImage,
-        price: Number(button.dataset.productPrice),
+    button.addEventListener('click', (e) => {
+      const productData = e.currentTarget.dataset;
+      openProductModal({ // Pasamos el objeto completo del producto
+        type: productData.productType,
+        nombre: productData.productName,
+        image: productData.productImage,
+        price: Number(productData.productPrice),
+        codigo: productData.productCode, // Para jerseys
       });
     });
   });
@@ -282,11 +228,11 @@ function setupStoreEvents() {
 }
 
 function openSizeModal(product, index) {
+  // Esta función ahora es un alias para jerseys
   currentProduct = {
     ...product,
-    type: 'jersey',
+    type: product.tag ? product.tag.toLowerCase() : 'jersey',
     price: product.precio,
-    image: getStoreImage(product.codigo),
   };
 
   openProductModal(currentProduct);
@@ -312,7 +258,7 @@ function openProductModal(product) {
   productImg.alt = currentProduct.nombre;
   modalTitle.textContent = currentProduct.type === 'jersey' ? 'Personaliza tu jersey' : 'Agrega un producto';
   modalDescription.textContent = currentProduct.type === 'jersey'
-    ? 'Selecciona la talla y la cantidad antes de agregarlo al carrito.'
+    ? 'Selecciona la talla, nombre y número antes de agregarlo al carrito.'
     : 'Selecciona cuántas unidades quieres antes de agregarlo al carrito.';
   customFields?.classList.toggle('hidden', currentProduct.type !== 'jersey');
   sizeOptions?.classList.toggle('hidden', currentProduct.type !== 'jersey');
@@ -500,8 +446,8 @@ function formatPrice(value) {
 
 
 function getStoreImage(code) {
-  // Prefer jerseys folder in assets; filenames expected to match country code (e.g., MEX.jpg)
-  return `./assets/jerseys/${code}.png` || './assets/trionda_ball.png';
+  // Esta función ya no es necesaria si la imagen viene en el JSON, pero se mantiene como fallback.
+  return code ? `./assets/jerseys/${code}.png` : './assets/trionda_ball.png';
 }
 
 loadStoreProducts();
