@@ -248,7 +248,7 @@ AFRAME.registerComponent('simple-drag-rotator', {
 // =====================================================
 AFRAME.registerComponent('ball-physics', {
   schema: {
-    gravity: { type: 'number', default: 0.010 }, // Fuerza con la que cae
+    gravity: { type: 'number', default: 0.005 }, // Fuerza con la que cae
     jumpStrength: { type: 'number', default: 0.10 }, // Fuerza del golpe hacia arriba
     bounceDamping: { type: 'number', default: 0.65 }, // Reducimos elasticidad para que pare pronto
     maxHeight: { type: 'number', default: 2.0 } // Altura máxima permitida (acumulable)
@@ -432,6 +432,18 @@ if (hud) {
 
     // Usamos el nuevo ModalManager
     window.ModalManager.load(name, currentCountry);
+  });
+}
+
+// =====================================================
+// HUD -> Botón de animación (Rebote)
+// =====================================================
+if (arAnimationBtn) {
+  arAnimationBtn.addEventListener("click", () => {
+    // Si no hay una pelota en la escena, no hacemos nada.
+    if (!currentBall) return;
+
+    triggerBounce(currentBall);
   });
 }
 
@@ -772,7 +784,7 @@ if (!scene) {
         updateVideoUIForCountry(country);
 
         await applyCountryTexture(ball, country.id);
-        playStarsFX(1800);
+        // playStarsFX(1800); // Desactivado a petición del usuario
 
         if (window.cargarDatosDesdeBD && country.code) {
           window.cargarDatosDesdeBD(country.code).then((datos) => {

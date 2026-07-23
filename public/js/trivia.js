@@ -17,32 +17,6 @@
   // -----------------------------
   const $ = (id) => document.getElementById(id);
 
-  const elTitle = $("trivia-title");
-  const elProgressText = $("trivia-progress-text");
-  const elBarFill = $("trivia-bar-fill");
-  const elScoreValue = $("trivia-score-value");
-
-  const elEmpty = $("trivia-empty");
-  const elQwrap = $("trivia-qwrap");
-  const elQuestion = $("trivia-question");
-  const elAnswers = $("trivia-answers");
-  const elFeedback = $("trivia-feedback");
-
-  const elNext = $("trivia-next");
-  const elRestart = $("trivia-restart");
-  const elRestart2 = $("trivia-restart-2");
-
-  const elResult = $("trivia-result");
-  const elResultText = $("trivia-result-text");
-
-  // Si el HTML aún no está actualizado, evitamos romper.
-  const requiredEls = [
-    elProgressText, elBarFill, elScoreValue,
-    elEmpty, elQwrap, elQuestion, elAnswers, elFeedback,
-    elNext, elRestart, elResult, elResultText
-  ];
-  const hasAllUI = requiredEls.every(Boolean);
-
   // -----------------------------
   // Estado
   // -----------------------------
@@ -51,7 +25,33 @@
   let idx = 0;
   let score = 0;
   let locked = false;      // evita doble respuesta
-  let lastWasCorrect = null;
+
+  // Objeto para cachear los elementos del DOM una vez encontrados
+  let UIElements = {};
+  let hasAllUI = false;
+
+  // Esta función busca los elementos del DOM y los guarda.
+  // Se llamará solo cuando se inicie la trivia.
+  function cacheUI() {
+    UIElements = {
+      title: $("trivia-title"),
+      progressText: $("trivia-progress-text"),
+      barFill: $("trivia-bar-fill"),
+      scoreValue: $("trivia-score-value"),
+      empty: $("trivia-empty"),
+      qwrap: $("trivia-qwrap"),
+      question: $("trivia-question"),
+      answers: $("trivia-answers"),
+      feedback: $("trivia-feedback"),
+      next: $("trivia-next"),
+      restart: $("trivia-restart"),
+      restart2: $("trivia-restart-2"),
+      result: $("trivia-result"),
+      resultText: $("trivia-result-text"),
+    };
+    // Verificamos que los elementos esenciales existan
+    hasAllUI = !!(UIElements.qwrap && UIElements.empty && UIElements.result);
+  }
 
   // -----------------------------
   // Utilidades
@@ -76,27 +76,27 @@
   }
 
   function setFeedback(type, msg) {
-    if (!elFeedback) return;
-    elFeedback.classList.remove("ok", "bad");
-    if (type) elFeedback.classList.add(type);
-    elFeedback.textContent = msg || "";
+    if (!UIElements.feedback) return;
+    UIElements.feedback.classList.remove("ok", "bad");
+    if (type) UIElements.feedback.classList.add(type);
+    UIElements.feedback.textContent = msg || "";
   }
 
   function setScore(val) {
     score = val;
-    if (elScoreValue) elScoreValue.textContent = String(score);
+    if (UIElements.scoreValue) UIElements.scoreValue.textContent = String(score);
   }
 
   function setProgress(i, total) {
     const safeTotal = Math.max(1, total);
     const safeI = clamp(i, 0, safeTotal);
-    if (elProgressText) elProgressText.textContent = `Pregunta ${safeI}/${safeTotal}`;
-    if (elBarFill) elBarFill.style.width = `${Math.round((safeI / safeTotal) * 100)}%`;
+    if (UIElements.progressText) UIElements.progressText.textContent = `Pregunta ${safeI}/${safeTotal}`;
+    if (UIElements.barFill) UIElements.barFill.style.width = `${Math.round((safeI / safeTotal) * 100)}%`;
   }
 
   function disableAnswers(disabled) {
-    if (!elAnswers) return;
-    const btns = elAnswers.querySelectorAll("button.trivia-answer");
+    if (!UIElements.answers) return;
+    const btns = UIElements.answers.querySelectorAll("button.trivia-answer");
     btns.forEach((b) => (b.disabled = !!disabled));
   }
 
@@ -104,12 +104,15 @@
   // Render principal
   // -----------------------------
   function render() {
-    if (!hasAllUI) return;
+    if (!hasAllUI) {
+      console.warn("Trivia UI no encontrada. El modal no se ha cargado correctamente.");
+      return;
+    }
 
     // Título
-    if (elTitle) {
+    if (UIElements.title) {
       const name = countryId ? countryId.toUpperCase() : "PAÍS";
-      elTitle.textContent = `Trivia — ${name}`;
+      UIElements.title.textContent = `Trivia — ${name}`;
     }
 
     // Si no hay país o no hay preguntas
@@ -117,12 +120,12 @@
     if (!countryId || total === 0) {
       setHidden(elEmpty, false);
       setHidden(elQwrap, true);
-      setHidden(elResult, true);
+      setHidden(UIElements.result, true);
 
       setProgress(0, 5);
       setScore(0);
       setFeedback(null, "");
-      if (elNext) elNext.disabled = true;
+      if (UIElements.next) UIElements.next.disabled = true;
       return;
     }
 
@@ -133,21 +136,20 @@
     }
 
     // Mostrar pregunta
-    setHidden(elEmpty, true);
-    setHidden(elResult, true);
-    setHidden(elQwrap, false);
+    setHidden(UIElements.empty, true);
+    setHidden(UIElements.result, true);
+    setHidden(UIElements.qwrap, false);
 
     const qObj = questions[idx];
-    setText(elQuestion, qObj.q);
+    setText(UIElements.question, qObj.q);
 
-    clearNode(elAnswers);
+    clearNode(UIElements.answers);
     setFeedback(null, "");
     locked = false;
-    lastWasCorrect = null;
 
     // Progreso y score
     setProgress(idx + 1, total);
-    if (elNext) elNext.disabled = true;
+    if (UIElements.next) UIElements.next.disabled = true;
 
     // Render opciones
     qObj.options.forEach((opt, i) => {
@@ -158,7 +160,7 @@
       btn.textContent = opt;
 
       btn.addEventListener("click", () => onAnswer(i));
-      elAnswers.appendChild(btn);
+      UIElements.answers.appendChild(btn);
     });
   }
 
@@ -171,7 +173,7 @@
     const qObj = questions[idx];
     const correctIdx = qObj.correct;
 
-    const buttons = elAnswers.querySelectorAll("button.trivia-answer");
+    const buttons = UIElements.answers.querySelectorAll("button.trivia-answer");
     buttons.forEach((b) => b.disabled = true);
 
     // marcar correcto/incorrecto visual
@@ -182,7 +184,6 @@
     });
 
     const isCorrect = chosenIdx === correctIdx;
-    lastWasCorrect = isCorrect;
 
     if (isCorrect) {
       setScore(score + 1);
@@ -192,7 +193,7 @@
       setFeedback("bad", `❌ Incorrecto — Respuesta: ${correctText}`);
     }
 
-    if (elNext) elNext.disabled = false;
+    if (UIElements.next) UIElements.next.disabled = false;
   }
 
   function next() {
@@ -204,17 +205,17 @@
   }
 
   function showResult() {
-    setHidden(elEmpty, true);
-    setHidden(elQwrap, true);
-    setHidden(elResult, false);
+    setHidden(UIElements.empty, true);
+    setHidden(UIElements.qwrap, true);
+    setHidden(UIElements.result, false);
 
     const total = questions.length || 5;
     setProgress(total, total);
 
     const msg = `Obtuviste ${score}/${total}`;
-    if (elResultText) elResultText.textContent = msg;
+    if (UIElements.resultText) UIElements.resultText.textContent = msg;
 
-    if (elNext) elNext.disabled = true;
+    if (UIElements.next) UIElements.next.disabled = true;
     setFeedback(null, "");
   }
 
@@ -232,7 +233,16 @@
   // API pública
   // -----------------------------
   function start(newCountryId) {
-    if (!hasAllUI) return;
+    // 1. Buscar y cachear los elementos del DOM del modal de trivia
+    cacheUI();
+    if (!hasAllUI) return; // Si no se encontraron, no continuar.
+
+    // 2. Asignar listeners a los botones (solo una vez)
+    UIElements.next.addEventListener("click", next);
+    UIElements.restart.addEventListener("click", restart);
+    if (UIElements.restart2) {
+      UIElements.restart2.addEventListener("click", restart);
+    }
 
     // Si viene null -> modo “escanea una bandera”
     countryId = newCountryId || null;
@@ -251,21 +261,8 @@
     questions = [];
     idx = 0;
     setScore(0);
-    if (hasAllUI) render();
+    render();
   }
-
-  // -----------------------------
-  // Listeners UI
-  // -----------------------------
-  if (hasAllUI) {
-    // siguiente
-    elNext.addEventListener("click", () => next());
-
-    // reiniciar (dos botones)
-    elRestart.addEventListener("click", () => restart());
-    if (elRestart2) elRestart2.addEventListener("click", () => restart());
-  }
-
   // Exponer API global
   window.Trivia = {
     start,

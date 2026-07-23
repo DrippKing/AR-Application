@@ -29,10 +29,10 @@
     { "pais_codigo": "UZB", "pregunta": "¿En qué continente está?", "opciones": ["Europa", "Asia", "África"], "respuesta_correcta": 1 }
   ],
   "usuarios": [
-    { "id": 1, "nombre": "Fernando Pérez", "correo": "fernando.perez@example.com" },
-    { "id": 2, "nombre": "María García", "correo": "maria.garcia@example.com" },
-    { "id": 3, "nombre": "Carlos Rodríguez", "correo": "carlos.rodriguez@example.com" },
-    { "id": 4, "nombre": "Ana Martínez", "correo": "ana.martinez@example.com" },
-    { "id": 5, "nombre": "Pedro López", "correo": "pedro.lopez@example.com" }
+    { "id": 1, "nombre": "Fernando Pérez", "correo": "fernando.perez@example.com", "Points": 0},
+    { "id": 2, "nombre": "María García", "correo": "maria.garcia@example.com", "Points": 0},
+    { "id": 3, "nombre": "Carlos Rodríguez", "correo": "carlos.rodriguez@example.com", "Points": 0 },
+    { "id": 4, "nombre": "Ana Martínez", "correo": "ana.martinez@example.com", "Points": 0 },
+    { "id": 5, "nombre": "Pedro López", "correo": "pedro.lopez@example.com", "Points": 0 }
   ]
 }

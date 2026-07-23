@@ -99,7 +99,6 @@
 
     els.content.innerHTML = `
       <section class="stadium-head">
-        <div class="stadium-badge">🏟 Estadio por país</div>
         <h3 class="stadium-main-title">${escapeHtml(stadium.name)}</h3>
         <p class="stadium-main-sub">
           ${escapeHtml(countryLabel)} · ${escapeHtml(stadium.city)}

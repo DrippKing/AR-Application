@@ -154,7 +154,6 @@
 
     els.content.innerHTML = `
       <section class="stats-head">
-        <div class="stats-badge">📊 Estadísticas por país</div>
         <h3 class="stats-country-title">${escapeHtml(countryData.countryLabel || countryId)}</h3>
         <p class="stats-country-sub">
           Resumen de los jugadores destacados, su estadio emblemático e historial mundialista.
