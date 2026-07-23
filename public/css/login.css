@@ -1,0 +1,126 @@
+/* stylelint-disable declaration-block-no-duplicate-properties */
+
+/* ======================================================
+   WorldScan 2026 — Hoja de Estilos para Login (login.css)
+   ====================================================== */
+body {
+  background: var(--bg); /* Fondo oscuro consistente */
+  background-image: radial-gradient(circle at 50% 0%, rgba(0, 177, 232, 0.15), transparent 40%);
+  overflow-y: auto; /* Permitir scroll si el contenido es muy alto en pantallas pequeñas */
+}
+
+.login-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 120px); /* Centrado vertical, descontando el topbar. Ajustado para la altura correcta del topbar */
+  padding: 20px;
+}
+
+.login-card {
+  width: min(94vw, 420px);
+  border-radius: 20px;
+  padding: 32px;
+  background: var(--bg-2);
+  border: 1px solid var(--stroke);
+  box-shadow: 0 35px 90px rgba(0, 0, 0, 0.45), 0 0 0 1px var(--stroke);
+  position: relative;
+  color: rgba(255, 255, 255, 0.92);
+  /* Efecto de brillo */
+  background-image: radial-gradient(ellipse at 50% -50%, rgba(0, 177, 232, 0.1), transparent 80%);
+}
+
+.login-header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.login-header h2 {
+  margin-bottom: 8px;
+}
+
+.login-header p {
+  font-size: 15px;
+  color: var(--muted);
+}
+
+#login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.input-group {
+  position: relative;
+}
+
+.input-group svg {
+  position: absolute;
+  top: 50%;
+  left: 16px;
+  transform: translateY(-50%);
+  color: var(--muted);
+  opacity: 0.6;
+  transition: opacity 0.2s ease;
+}
+
+.input-group input {
+  background: var(--card-2);
+  border: 1px solid var(--stroke);
+  border-radius: 12px;
+  padding: 12px 16px 12px 50px; /* Espacio para el icono */
+  color: var(--text);
+  font-size: 16px;
+  min-height: 48px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  width: 100%;
+}
+
+.input-group input::placeholder {
+  color: rgba(238, 246, 255, 0.5);
+}
+
+.input-group input:focus {
+  outline: none;
+  border-color: var(--cyan);
+  box-shadow: 0 0 0 3px rgba(0, 177, 232, 0.2);
+}
+.input-group input:focus + svg {
+  opacity: 1;
+  color: var(--cyan);
+}
+
+.form-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 16px;
+  gap: 16px;
+}
+
+.forgot-password {
+  font-size: 14px;
+  color: var(--muted);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.forgot-password:hover {
+  color: var(--text);
+}
+
+.login-footer {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--stroke);
+  text-align: center;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.login-footer a {
+  color: var(--cyan);
+  font-weight: 500;
+}
+
+/* stylelint-enable declaration-block-no-duplicate-properties */

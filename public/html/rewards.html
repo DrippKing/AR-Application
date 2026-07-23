@@ -91,55 +91,83 @@
   </div>
 
   <script>
-    const pointsValue = document.getElementById('pointsValue');
-    const paymentModal = document.getElementById('paymentModal');
-    const modalTitle = document.getElementById('modalTitle');
-    const modalSubtitle = document.getElementById('modalSubtitle');
-    const cancelPayment = document.getElementById('cancelPayment');
-    const closePaymentModal = document.getElementById('closePaymentModal');
-    const confirmPayment = document.getElementById('confirmPayment');
-    const packs = document.querySelectorAll('.pack');
+    document.addEventListener('DOMContentLoaded', async () => {
+      const pointsValue = document.getElementById('pointsValue');
+      const paymentModal = document.getElementById('paymentModal');
+      const modalTitle = document.getElementById('modalTitle');
+      const modalSubtitle = document.getElementById('modalSubtitle');
+      const cancelPayment = document.getElementById('cancelPayment');
+      const closePaymentModal = document.getElementById('closePaymentModal');
+      const confirmPayment = document.getElementById('confirmPayment');
+      const packs = document.querySelectorAll('.pack');
 
-    let points = 120;
-    let selectedPack = null;
+      let selectedPack = null;
+      const userId = localStorage.getItem('worldscan_userId');
 
-    function renderPoints() {
-      pointsValue.textContent = points;
-    }
-
-    function openModal(packEl) {
-      selectedPack = packEl.dataset;
-      modalTitle.textContent = `Comprar ${selectedPack.name}`;
-      modalSubtitle.textContent = `Vas a comprar ${selectedPack.points} puntos por ${selectedPack.price}.`;
-      paymentModal.classList.add('open');
-      paymentModal.setAttribute('aria-hidden', 'false');
-    }
-
-    function closeModal() {
-      paymentModal.classList.remove('open');
-      paymentModal.setAttribute('aria-hidden', 'true');
-    }
-
-    packs.forEach((pack) => {
-      pack.addEventListener('click', () => openModal(pack));
-    });
-
-    cancelPayment.addEventListener('click', closeModal);
-    closePaymentModal.addEventListener('click', closeModal);
-    paymentModal.addEventListener('click', (e) => {
-      if (e.target === paymentModal) closeModal();
-    });
-
-    confirmPayment.addEventListener('click', () => {
-      if (selectedPack) {
-        points += Number(selectedPack.points);
-        renderPoints();
-        closeModal();
-        alert(`¡Pago confirmado! Se añadieron ${selectedPack.points} puntos.`);
+      if (!userId) {
+        alert('Debes iniciar sesión para ver tus puntos y comprar paquetes.');
+        window.location.href = '/login';
+        return;
       }
-    });
 
-    renderPoints();
+      async function fetchUserPoints() {
+        try {
+          const response = await fetch(`/api/user/${userId}`);
+          const data = await response.json();
+          if (data.success) {
+            pointsValue.textContent = data.user.points.toLocaleString();
+          }
+        } catch (error) {
+          console.error('Error al obtener los puntos del usuario:', error);
+          pointsValue.textContent = 'Error';
+        }
+      }
+
+      function openModal(packEl) {
+        selectedPack = packEl.dataset;
+        modalTitle.textContent = `Comprar ${selectedPack.name}`;
+        modalSubtitle.textContent = `Vas a comprar ${selectedPack.points} puntos por ${selectedPack.price}.`;
+        paymentModal.classList.add('open');
+        paymentModal.setAttribute('aria-hidden', 'false');
+      }
+
+      function closeModal() {
+        paymentModal.classList.remove('open');
+        paymentModal.setAttribute('aria-hidden', 'true');
+      }
+
+      packs.forEach((pack) => pack.addEventListener('click', () => openModal(pack)));
+      cancelPayment.addEventListener('click', closeModal);
+      closePaymentModal.addEventListener('click', closeModal);
+      paymentModal.addEventListener('click', (e) => {
+        if (e.target === paymentModal) closeModal();
+      });
+
+      confirmPayment.addEventListener('click', async () => {
+        if (!selectedPack) return;
+        confirmPayment.disabled = true;
+        confirmPayment.textContent = 'Procesando...';
+
+        const response = await fetch('/api/user/add-points', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId, pointsToAdd: selectedPack.points }),
+        });
+        const data = await response.json();
+
+        if (data.success) {
+          alert(`¡Pago confirmado! Se añadieron ${selectedPack.points} puntos.`);
+          await fetchUserPoints();
+          closeModal();
+        } else {
+          alert(`Error: ${data.message}`);
+        }
+        confirmPayment.disabled = false;
+        confirmPayment.textContent = 'Confirmar pago';
+      });
+
+      await fetchUserPoints();
+    });
   </script>
 </body>
 </html>

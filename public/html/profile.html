@@ -1,73 +1,61 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mi Perfil — WorldScan 2026</title>
-
-  <!-- Estilos específicos para la página de perfil -->
-  <link rel="stylesheet" href="/css/profile.css" />
+  <link rel="stylesheet" href="/css/scanner.css">
+  <link rel="stylesheet" href="/css/profile.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
-  <!-- Elementos de fondo de la landing page -->
-  <div class="bg-orb orb-1"></div>
-  <div class="bg-orb orb-2"></div>
-  <div class="bg-grid"></div>
 
-  <!-- Barra de navegación superior -->
   <header class="topbar">
-    <a href="/home" class="brand">
-      <img src="/assets/trionda_ball.png" alt="Balón WorldScan 2026" class="brand-ball" />
-      <div class="brand-text">
-        <span class="brand-title">WorldScan</span>
-        <span class="brand-year">2026</span>
+    <a href="/home" class="brand-link">
+      <div class="brand">
+        <img src="/assets/trionda_ball.png" alt="Balón WorldScan 2026" class="brand-ball">
+        <div class="brand-text">
+          <span class="brand-title">WorldScan</span>
+          <span class="brand-year">2026</span>
+        </div>
       </div>
     </a>
     <a href="/scanner" class="topbar-btn">Ir al escáner</a>
   </header>
 
-  <!-- Contenido principal -->
-  <main>
-    <section class="profile-section">
-      <div class="profile-card">
-        <!-- Cabecera del perfil -->
-        <div class="profile-header">
-          <div class="profile-avatar" aria-label="Avatar de usuario">👤</div>
-          <div class="profile-info">
-            <h2>Nombre de Usuario</h2>
-            <p>usuario@email.com</p>
-          </div>
+  <main class="profile-container">
+    <div class="profile-card">
+      <div class="profile-header">
+        <div class="profile-avatar">
+          <span id="profile-initials">--</span>
         </div>
+        <h2 id="profile-name">Cargando...</h2>
+        <p id="profile-email" class="muted">Cargando correo...</p>
+      </div>
 
-        <!-- Estadísticas del usuario -->
-        <div class="profile-stats">
-          <div class="stat-item">
-            <span class="label">Banderas Escaneadas</span>
-            <span class="value">5 / 10</span>
-          </div>
-          <div class="stat-item">
-            <span class="label">Puntos Rewards</span>
-            <span class="value">1,250</span>
-          </div>
-          <div class="stat-item">
-            <span class="label">Trivias Completadas</span>
-            <span class="value">3</span>
-          </div>
+      <div class="stats-grid">
+        <div class="stat-item">
+          <span class="stat-label">Puntos Acumulados</span>
+          <span id="profile-points" class="stat-value">0</span>
         </div>
-
-        <!-- Acciones del perfil -->
-        <div class="profile-actions">
-          <button class="primary-btn" type="button">Editar Perfil</button>
-          <button class="secondary-btn" type="button">Cerrar Sesión</button>
+        <div class="stat-item">
+          <span class="stat-label">Países Escaneados</span>
+          <span class="stat-value">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Trivias Completadas</span>
+          <span class="stat-value">0</span>
         </div>
       </div>
-    </section>
+
+      <div class="profile-actions">
+        <button id="logout-btn" class="logout-btn">Cerrar Sesión</button>
+      </div>
+    </div>
   </main>
 
-  <!-- Footer -->
-  <footer class="footer">
-    <p>WorldScan 2026 · Experiencia WebAR del Mundial 2026</p>
-    <a href="/scanner" class="footer-link">Abrir escáner</a>
-  </footer>
+  <script src="/js/profile.js"></script>
 </body>
 </html>

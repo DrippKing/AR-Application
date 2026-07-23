@@ -4,22 +4,25 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Tienda WorldScan 2026</title>
+  <link rel="stylesheet" href="/css/scanner.css" /> <!-- Reutilizamos estilos -->
   <link rel="stylesheet" href="/css/store.css" />
 </head>
 <body>
-  <div id="tittle-banner">
-    <a id="logo" href="/scanner" aria-label="Volver al escáner">
-      <img src="/assets/trionda_ball.png" alt="Logo Mundial 2026" width="36" height="36" />
-      <div class="banner-text">
-        <h1>WorldScan</h1>
-        <h3>2026</h3>
+  <header class="topbar">
+    <a href="/home" class="brand-link">
+      <div class="brand">
+        <img src="/assets/trionda_ball.png" alt="Balón WorldScan 2026" class="brand-ball">
+        <div class="brand-text">
+          <span class="brand-title">WorldScan</span>
+          <span class="brand-year">2026</span>
+        </div>
       </div>
     </a>
-    <div class="header-actions hidden">
-      <a href="/rewards" class="banner-action" target="_blank" rel="noopener noreferrer" aria-label="Abrir Rewards">💵</a>
-      <button id="cart-open-btn" class="banner-action header-cart-btn" type="button" aria-label="Abrir carrito">🛒</button>
+    <div class="header-actions hidden"> <!-- Oculto por defecto -->
+      <a href="/rewards" class="topbar-btn" title="Rewards">💵</a>
+      <button id="cart-open-btn" class="topbar-btn" type="button" title="Carrito">🛒</button>
     </div>
-  </div>
+  </header>
 
   <main class="store-page">
     <section class="store-panel">
@@ -110,6 +113,16 @@
     </div>
   </div>
 
+  <script>
+    // Script rápido para mostrar los botones si el usuario está logueado
+    document.addEventListener('DOMContentLoaded', () => {
+      const userId = localStorage.getItem('worldscan_userId');
+      if (userId) {
+        const headerActions = document.querySelector('.header-actions');
+        headerActions?.classList.remove('hidden');
+      }
+    });
+  </script>
   <script src="/js/store.js"></script>
 </body>
 </html>

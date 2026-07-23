@@ -1,131 +1,72 @@
-document.addEventListener('DOMContentLoaded', () => {
-  const authPanel = document.getElementById('auth-panel');
-  const authLoggedOut = document.getElementById('auth-logged-out');
-  const authLoggedIn = document.getElementById('auth-logged-in');
-  const authMessage = document.getElementById('auth-message');
+document.addEventListener('DOMContentLoaded', async () => {
+  const profileBtn = document.getElementById('profile-btn');
   const loginForm = document.getElementById('login-form');
-  const registerForm = document.getElementById('register-form');
-  const profileName = document.getElementById('profile-name');
-  const profileEmail = document.getElementById('profile-email');
-  const logoutBtn = document.getElementById('logout-btn');
 
-  const tabs = Array.from(document.querySelectorAll('.auth-tab'));
-  const views = {
-    login: loginForm,
-    register: registerForm,
-  };
+  // Lógica para el botón de perfil (presente en varias páginas)
+  if (profileBtn) {
+    const userId = localStorage.getItem('worldscan_userId');
 
-  function setMessage(text, type = '') {
-    if (!authMessage) return;
-    authMessage.textContent = text;
-    authMessage.className = `auth-message ${type}`.trim();
-  }
-
-  function showAuthView(viewName) {
-    tabs.forEach((tab) => {
-      tab.classList.toggle('active', tab.dataset.authView === viewName);
-    });
-
-    Object.entries(views).forEach(([name, form]) => {
-      form.classList.toggle('auth-hidden', name !== viewName);
-    });
-  }
-
-  function renderAuthState(user) {
-    if (!authLoggedOut || !authLoggedIn || !profileName || !profileEmail) return;
-
-    if (user) {
-      authLoggedOut.classList.add('auth-hidden');
-      authLoggedIn.classList.remove('auth-hidden');
-      profileName.textContent = user.nombre || 'Usuario';
-      profileEmail.textContent = user.correo || '';
-      setMessage('Sesión activa', 'success');
+    if (userId) {
+      // Si el usuario está logueado, buscamos su nombre para mostrarlo en el botón.
+      try {
+        const response = await fetch(`/api/user/${userId}`);
+        const data = await response.json();
+        if (data.success) {
+          // Usamos el primer nombre para que no sea tan largo.
+          profileBtn.textContent = data.user.nombre.split(' ')[0];
+        }
+      } catch (error) {
+        console.error('Error al obtener el nombre del usuario:', error);
+        profileBtn.textContent = 'Perfil'; // Fallback en caso de error
+      }
     } else {
-      authLoggedOut.classList.remove('auth-hidden');
-      authLoggedIn.classList.add('auth-hidden');
-      setMessage('', '');
+      // Si no hay usuario, el botón dirá "Iniciar Sesión".
+      profileBtn.textContent = 'Iniciar Sesión';
     }
+
+    profileBtn.addEventListener('click', () => {
+      // Si hay un ID de usuario, redirige al perfil. Si no, a la página de login.
+      window.location.href = userId ? '/profile' : '/login';
+    });
   }
 
-  function saveUser(user) {
-    localStorage.setItem('worldscanUser', JSON.stringify(user));
-  }
+  // Nueva lógica para la página de login
+  if (loginForm) {
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault(); // Previene el envío real del formulario
 
-  function loadUser() {
-    try {
-      const raw = localStorage.getItem('worldscanUser');
-      return raw ? JSON.parse(raw) : null;
-    } catch (error) {
-      return null;
-    }
-  }
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const submitButton = loginForm.querySelector('button[type="submit"]');
 
-  function clearUser() {
-    localStorage.removeItem('worldscanUser');
-  }
+      submitButton.disabled = true;
+      submitButton.textContent = 'Verificando...';
 
-  tabs.forEach((tab) => {
-    tab.addEventListener('click', () => showAuthView(tab.dataset.authView));
-  });
+      try {
+        const response = await fetch('/api/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email, password }),
+        });
 
-  loginForm?.addEventListener('submit', async (event) => {
-    event.preventDefault();
-    const formData = Object.fromEntries(new FormData(loginForm));
+        const data = await response.json();
 
-    try {
-      const response = await fetch('/api/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
-      });
-
-      const data = await response.json();
-
-      if (!response.ok || !data.success) {
-        setMessage(data.message || 'No se pudo iniciar sesión.', 'error');
-        return;
+        if (data.success) {
+          // Guardamos el ID del usuario en localStorage
+          localStorage.setItem('worldscan_userId', data.user.id);
+          alert(`¡Bienvenido, ${data.user.nombre}! Redirigiendo a tu perfil.`);
+          window.location.href = '/profile';
+        } else {
+          alert(`Error: ${data.message}`);
+        }
+      } catch (error) {
+        alert('Error de conexión. No se pudo contactar al servidor.');
+      } finally {
+        submitButton.disabled = false;
+        submitButton.textContent = 'Ingresar';
       }
-
-      saveUser(data.user);
-      renderAuthState(data.user);
-      loginForm.reset();
-    } catch (error) {
-      setMessage('Error de conexión con el servidor.', 'error');
-    }
-  });
-
-  registerForm?.addEventListener('submit', async (event) => {
-    event.preventDefault();
-    const formData = Object.fromEntries(new FormData(registerForm));
-
-    try {
-      const response = await fetch('/api/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
-      });
-
-      const data = await response.json();
-
-      if (!response.ok || !data.success) {
-        setMessage(data.message || 'No se pudo crear la cuenta.', 'error');
-        return;
-      }
-
-      saveUser(data.user);
-      renderAuthState(data.user);
-      registerForm.reset();
-    } catch (error) {
-      setMessage('Error de conexión con el servidor.', 'error');
-    }
-  });
-
-  logoutBtn?.addEventListener('click', () => {
-    clearUser();
-    renderAuthState(null);
-  });
-
-  const savedUser = loadUser();
-  renderAuthState(savedUser);
-  showAuthView(savedUser ? 'login' : 'login');
+    });
+  }
 });
