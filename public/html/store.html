@@ -43,7 +43,7 @@
       <button class="modal-close" type="button" data-close aria-label="Cerrar">✕</button>
       <div class="modal-head">
         <h2 id="size-title">Personaliza tu jersey</h2>
-        <p>Selecciona la talla que prefieras antes de agregarlo al carrito.</p>
+        <p id="size-description">Selecciona la talla y la cantidad antes de agregarlo al carrito.</p>
       </div>
       <div class="modal-body store-size-body">
         <div class="store-modal-top">
@@ -59,6 +59,7 @@
               <label>Nombre en el jersey<input type="text" id="jersey-name" placeholder="Ej. ÁLVAREZ" style="text-transform: uppercase;" /></label>
               <label>Número en el jersey<input type="number" id="jersey-number" min="0" placeholder="10" /></label>
             </div>
+            <label class="quantity-field">Cantidad de unidades<input type="number" id="product-quantity" min="1" value="1" /></label>
           </div>
         </div>
         <div class="size-options">

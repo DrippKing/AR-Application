@@ -2,7 +2,7 @@ const express = require('express');
 const path = require('path');
 const fs = require('fs');
 const app = express();
-const port = 3000;
+const port = 3001;
 const htmlDir = path.join(__dirname, 'public', 'html');
 
 function sendHtmlPage(res, pageName) {

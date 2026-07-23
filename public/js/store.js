@@ -2,6 +2,60 @@ const cart = [];
 let currentProduct = null;
 let currentProducts = [];
 
+function createTemplateCards(count) {
+  return Array.from({ length: count }, () => `
+    <article class="store-card store-template-card">
+      <div class="store-template-slot" aria-hidden="true"></div>
+    </article>
+  `).join('');
+}
+
+function createThermoCards() {
+  const thermos = [
+    ['thermo_1.png', 'Termo Azul Marino'],
+    ['thermo_2.png', 'Termo Azul Brillante'],
+    ['thermo_3.png', 'Termo Rojo'],
+    ['thermo_4.png', 'Termo Blanco y Crema'],
+    ['thermo_5.png', 'Termo Rosa'],
+    ['thermo_6.png', 'Termo Negro Deportivo'],
+    ['thermo_7.png', 'Termo Negro y Naranja'],
+    ['thermo_8.png', 'Termo Azul Deportivo'],
+  ];
+
+  return thermos.map(([image, name]) => `
+    <article class="store-card store-thermo-card">
+      <h3>${name}</h3>
+      <button type="button" class="store-image store-product-btn" data-product-type="termo" data-product-name="${name}" data-product-image="/assets/thermos/${image}">
+        <img src="/assets/thermos/${image}" alt="${name}" />
+      </button>
+    </article>
+  `).join('');
+}
+
+function createBallCards() {
+  const balls = [
+    ['ball_1.png', 'Balón Blanco Azul y Rojo'],
+    ['ball_2.png', 'Balón Blanco y Negro'],
+    ['ball_3.png', 'Balón Azul y Blanco'],
+    ['ball_4.png', 'Balón Azul Intenso'],
+    ['ball_5.png', 'Balón Blanco Azul y Rojo II'],
+    ['ball_6.png', 'Balón Multicolor'],
+    ['ball_7.png', 'Balón Blanco Azul y Negro'],
+    ['ball_8.png', 'Balón Blanco Rojo y Negro'],
+    ['ball_9.png', 'Balón Blanco Rojo y Azul'],
+    ['ball_10.png', 'Balón Naranja Azul y Negro'],
+  ];
+
+  return balls.map(([image, name]) => `
+    <article class="store-card store-ball-card">
+      <h3>${name}</h3>
+      <button type="button" class="store-image store-product-btn" data-product-type="balon" data-product-name="${name}" data-product-image="/assets/balls/${image}">
+        <img src="/assets/balls/${image}" alt="${name}" />
+      </button>
+    </article>
+  `).join('');
+}
+
 async function loadStoreProducts() {
   const storeContent = document.getElementById('store-content');
   if (!storeContent) return;
@@ -35,8 +89,28 @@ async function loadStoreProducts() {
     }).join('');
 
     storeContent.innerHTML = `
-      <div class="store-summary">Mostrando ${paises.length} productos del Mundial 2026.</div>
-      <div class="store-grid">${cards}</div>
+      <nav class="store-categories" aria-label="Categorías de la tienda">
+        <button class="store-category-btn is-active" type="button" data-category="jerseys" aria-pressed="true">Jerseys</button>
+        <button class="store-category-btn" type="button" data-category="balones" aria-pressed="false">Balones</button>
+        <button class="store-category-btn" type="button" data-category="termos" aria-pressed="false">Termos</button>
+        <button class="store-category-btn" type="button" data-category="cupones" aria-pressed="false">Cupones</button>
+      </nav>
+      <section class="store-category-view" data-category-view="jerseys">
+        <div class="store-summary">Mostrando ${paises.length} productos del Mundial 2026.</div>
+        <div class="store-grid">${cards}</div>
+      </section>
+      <section class="store-category-view hidden" data-category-view="balones">
+        <div class="store-summary">Mostrando 10 balones disponibles.</div>
+        <div class="store-grid">${createBallCards()}</div>
+      </section>
+      <section class="store-category-view hidden" data-category-view="termos">
+        <div class="store-summary">Mostrando 8 termos disponibles.</div>
+        <div class="store-grid">${createThermoCards()}</div>
+      </section>
+      <section class="store-category-view hidden" data-category-view="cupones">
+        <div class="store-summary">Plantillas para agregar cupones.</div>
+        <div class="store-grid">${createTemplateCards(6)}</div>
+      </section>
     `;
 
     setupStoreEvents();
@@ -63,10 +137,37 @@ function setupStoreEvents() {
     });
   }
 
+  document.querySelectorAll('.store-category-btn').forEach((button) => {
+    button.addEventListener('click', () => {
+      const category = button.dataset.category;
+
+      document.querySelectorAll('.store-category-btn').forEach((categoryButton) => {
+        const isActive = categoryButton === button;
+        categoryButton.classList.toggle('is-active', isActive);
+        categoryButton.setAttribute('aria-pressed', String(isActive));
+      });
+
+      document.querySelectorAll('[data-category-view]').forEach((view) => {
+        view.classList.toggle('hidden', view.dataset.categoryView !== category);
+      });
+    });
+  });
+
   document.querySelectorAll('.store-image-btn').forEach((button) => {
     button.addEventListener('click', () => {
       const index = Number(button.dataset.index);
       openSizeModal(currentProducts[index], index);
+    });
+  });
+
+  document.querySelectorAll('.store-product-btn').forEach((button) => {
+    button.addEventListener('click', () => {
+      openProductModal({
+        type: button.dataset.productType,
+        nombre: button.dataset.productName,
+        image: button.dataset.productImage,
+        price: 0,
+      });
     });
   });
 
@@ -76,6 +177,8 @@ function setupStoreEvents() {
   });
 
   addToCartBtn?.addEventListener('click', () => {
+    const quantityInput = document.getElementById('product-quantity');
+    const quantity = Math.max(1, Number(quantityInput?.value) || 1);
     const size = document.querySelector('input[name="size"]:checked')?.value || 'M';
     const jerseyName = (document.getElementById('jersey-name')?.value.trim() || 'SIN NOMBRE').toUpperCase();
     const jerseyNumber = document.getElementById('jersey-number')?.value.trim() || '00';
@@ -83,11 +186,12 @@ function setupStoreEvents() {
 
     cart.push({
       name: currentProduct.nombre,
-      price: currentProduct.price,
-      size,
+      price: currentProduct.price || 0,
+      quantity,
+      size: currentProduct.type === 'jersey' ? size : '',
       image: currentProduct.image,
-      jerseyName,
-      jerseyNumber,
+      jerseyName: currentProduct.type === 'jersey' ? jerseyName : '',
+      jerseyNumber: currentProduct.type === 'jersey' ? jerseyNumber : '',
     });
 
     closeModal(sizeModal);
@@ -126,21 +230,40 @@ function setupStoreEvents() {
 function openSizeModal(product, index) {
   currentProduct = {
     ...product,
+    type: 'jersey',
     price: product.precio,
     image: getStoreImage(product.codigo),
   };
 
+  openProductModal(currentProduct);
+}
+
+function openProductModal(product) {
+  currentProduct = product;
+
   const sizeModal = document.getElementById('modal-size');
+  const modalTitle = document.getElementById('size-title');
+  const modalDescription = document.getElementById('size-description');
   const productName = document.getElementById('size-product-name');
   const productPrice = document.getElementById('size-product-price');
   const productImg = document.getElementById('size-product-img');
+  const customFields = document.querySelector('.custom-fields');
+  const sizeOptions = document.querySelector('.size-options');
 
-  if (!sizeModal || !productName || !productPrice || !productImg) return;
+  if (!sizeModal || !modalTitle || !modalDescription || !productName || !productPrice || !productImg) return;
 
   productName.textContent = currentProduct.nombre;
-  productPrice.textContent = formatPrice(currentProduct.price);
+  productPrice.textContent = currentProduct.type === 'jersey' ? formatPrice(currentProduct.price) : 'Precio por definir';
   productImg.src = currentProduct.image;
   productImg.alt = currentProduct.nombre;
+  modalTitle.textContent = currentProduct.type === 'jersey' ? 'Personaliza tu jersey' : 'Agrega un producto';
+  modalDescription.textContent = currentProduct.type === 'jersey'
+    ? 'Selecciona la talla y la cantidad antes de agregarlo al carrito.'
+    : 'Selecciona cuántas unidades quieres antes de agregarlo al carrito.';
+  customFields?.classList.toggle('hidden', currentProduct.type !== 'jersey');
+  sizeOptions?.classList.toggle('hidden', currentProduct.type !== 'jersey');
+  const quantityInput = document.getElementById('product-quantity');
+  if (quantityInput) quantityInput.value = '1';
 
   openModal(sizeModal);
 }
@@ -191,15 +314,17 @@ function renderCart() {
   let total = 0;
 
   cart.forEach((item, index) => {
-    total += item.price;
+    const quantity = item.quantity || 1;
+    total += item.price * quantity;
     const itemElement = document.createElement('div');
     itemElement.className = 'cart-item';
     itemElement.innerHTML = `
       <img src="${item.image}" alt="${item.name}" />
       <div class="cart-item-info">
         <strong>${item.name}</strong>
-        <p>Talla: ${item.size}</p>
-        <p>${formatPrice(item.price)}</p>
+        <p>Unidades: ${quantity}</p>
+        ${item.size ? `<p>Talla: ${item.size}</p>` : ''}
+        <p>${formatPrice(item.price * quantity)}</p>
       </div>
       <button class="secondary-btn cart-remove-btn" type="button" data-index="${index}">Eliminar</button>
     `;
@@ -250,7 +375,7 @@ function confirmPurchase() {
     return;
   }
 
-  const total = cart.reduce((sum, item) => sum + item.price, 0);
+  const total = cart.reduce((sum, item) => sum + (item.price * (item.quantity || 1)), 0);
   if (purchaseSuccess) {
     purchaseSuccess.classList.remove('hidden');
     purchaseSuccess.textContent = `Compra confirmada. Total pagado: ${formatPrice(total)}. Envío a: ${name}, ${address}, ${city}, ${state}, ${zip}.`;
