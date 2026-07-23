@@ -141,7 +141,7 @@
     setHidden(UIElements.qwrap, false);
 
     const qObj = questions[idx];
-    setText(UIElements.question, qObj.q);
+    setText(UIElements.question, qObj.pregunta);
 
     clearNode(UIElements.answers);
     setFeedback(null, "");
@@ -152,7 +152,7 @@
     if (UIElements.next) UIElements.next.disabled = true;
 
     // Render opciones
-    qObj.options.forEach((opt, i) => {
+    qObj.opciones.forEach((opt, i) => {
       const btn = document.createElement("button");
       btn.type = "button";
       btn.className = "trivia-answer";
@@ -171,7 +171,7 @@
     locked = true;
 
     const qObj = questions[idx];
-    const correctIdx = qObj.correct;
+    const correctIdx = qObj.respuesta_correcta;
 
     const buttons = UIElements.answers.querySelectorAll("button.trivia-answer");
     buttons.forEach((b) => b.disabled = true);
@@ -186,14 +186,33 @@
     const isCorrect = chosenIdx === correctIdx;
 
     if (isCorrect) {
-      setScore(score + 1);
+      // Sumar los puntos de la pregunta actual al score total
+      const pointsWon = qObj.points || 100; // Usar 100 como fallback si no hay puntos definidos
+      setScore(score + pointsWon);
       setFeedback("ok", "✅ Correcto");
+      awardPoints(pointsWon); // Guardar los puntos en la BD
     } else {
-      const correctText = qObj.options[correctIdx] ?? "la opción correcta";
+      const correctText = qObj.opciones[correctIdx] ?? "la opción correcta";
       setFeedback("bad", `❌ Incorrecto — Respuesta: ${correctText}`);
     }
 
     if (UIElements.next) UIElements.next.disabled = false;
+  }
+
+  async function awardPoints(pointsToAdd) {
+    const userId = localStorage.getItem('worldscan_userId');
+    if (!userId || !pointsToAdd) return;
+
+    try {
+      await fetch('/api/user/add-points', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, pointsToAdd }),
+      });
+      console.log(`🏆 Puntos guardados: ${pointsToAdd} para el usuario ${userId}`);
+    } catch (error) {
+      console.error('Error al guardar los puntos en la base de datos:', error);
+    }
   }
 
   function next() {
@@ -212,7 +231,8 @@
     const total = questions.length || 5;
     setProgress(total, total);
 
-    const msg = `Obtuviste ${score}/${total}`;
+    // Mensaje final con el total de puntos ganados
+    const msg = `Felicidades, ganaste ${score.toLocaleString()} puntos`;
     if (UIElements.resultText) UIElements.resultText.textContent = msg;
 
     if (UIElements.next) UIElements.next.disabled = true;
@@ -220,7 +240,7 @@
   }
 
   function restart() {
-    if (!countryId || !window.TRIVIA_DB) {
+    if (!countryId) {
       reset();
       return;
     }
@@ -232,7 +252,7 @@
   // -----------------------------
   // API pública
   // -----------------------------
-  function start(newCountryId) {
+  function start(newCountryId, newQuestions = []) {
     // 1. Buscar y cachear los elementos del DOM del modal de trivia
     cacheUI();
     if (!hasAllUI) return; // Si no se encontraron, no continuar.
@@ -247,8 +267,7 @@
     // Si viene null -> modo “escanea una bandera”
     countryId = newCountryId || null;
 
-    const db = window.TRIVIA_DB || {};
-    questions = countryId && Array.isArray(db[countryId]) ? db[countryId].slice() : [];
+    questions = Array.isArray(newQuestions) ? newQuestions : [];
 
     idx = 0;
     setScore(0);
