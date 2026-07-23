@@ -40,7 +40,13 @@
 
       // Lógica de inicialización post-carga
       if (modalName === 'modal-video') window.VideoPlayer?.initialize(currentCountry);
-      if (modalName === 'modal-trivia') window.Trivia?.start(currentCountry ? currentCountry.id : undefined);
+      if (modalName === 'modal-trivia' && currentCountry) {
+        // Obtener las preguntas de la API y luego iniciar la trivia
+        fetch(`/api/trivia/${currentCountry.code}`)
+          .then(res => res.json())
+          .then(triviaQuestions => window.Trivia?.start(currentCountry.code, triviaQuestions))
+          .catch(err => console.error('Error al cargar preguntas de trivia:', err));
+      }
       if (modalName === 'modal-stats') window.Stats?.render(currentCountry ? currentCountry.id : undefined);
       if (modalName === 'modal-estadio') window.Stadium?.render(currentCountry ? currentCountry.id : undefined);
 

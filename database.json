@@ -120,7 +120,8 @@
         "1986",
         "1994"
       ],
-      "respuesta_correcta": 0
+      "respuesta_correcta": 0,
+      "points": 150
     },
     {
       "pais_codigo": "MEX",
@@ -130,7 +131,8 @@
         "Chicharito",
         "Borgetti"
       ],
-      "respuesta_correcta": 1
+      "respuesta_correcta": 1,
+      "points": 200
     },
     {
       "pais_codigo": "MEX",
@@ -140,7 +142,8 @@
         "El Tri",
         "La Albiceleste"
       ],
-      "respuesta_correcta": 1
+      "respuesta_correcta": 1,
+      "points": 120
     },
     {
       "pais_codigo": "COL",
@@ -150,7 +153,8 @@
         "La Roja",
         "Los Charrúas"
       ],
-      "respuesta_correcta": 0
+      "respuesta_correcta": 0,
+      "points": 110
     },
     {
       "pais_codigo": "COL",
@@ -160,7 +164,8 @@
         "Verde y blanco",
         "Rojo y blanco"
       ],
-      "respuesta_correcta": 0
+      "respuesta_correcta": 0,
+      "points": 130
     },
     {
       "pais_codigo": "JPN",
@@ -170,7 +175,8 @@
         "Les Bleus",
         "Azzurri"
       ],
-      "respuesta_correcta": 0
+      "respuesta_correcta": 0,
+      "points": 180
     },
     {
       "pais_codigo": "JPN",
@@ -180,7 +186,8 @@
         "Un círculo rojo",
         "Un dragón"
       ],
-      "respuesta_correcta": 1
+      "respuesta_correcta": 1,
+      "points": 160
     },
     {
       "pais_codigo": "ESP",
@@ -190,7 +197,8 @@
         "2010",
         "2014"
       ],
-      "respuesta_correcta": 1
+      "respuesta_correcta": 1,
+      "points": 250
     },
     {
       "pais_codigo": "ESP",
@@ -200,7 +208,8 @@
         "La Verde",
         "La Celeste"
       ],
-      "respuesta_correcta": 0
+      "respuesta_correcta": 0,
+      "points": 100
     },
     {
       "pais_codigo": "KOR",
@@ -210,7 +219,8 @@
         "Finalista",
         "Semifinal (4º lugar)"
       ],
-      "respuesta_correcta": 2
+      "respuesta_correcta": 2,
+      "points": 300
     },
     {
       "pais_codigo": "NED",
@@ -220,7 +230,8 @@
         "Azul",
         "Verde"
       ],
-      "respuesta_correcta": 0
+      "respuesta_correcta": 0,
+      "points": 140
     },
     {
       "pais_codigo": "RSA",
@@ -230,7 +241,8 @@
         "2010",
         "2014"
       ],
-      "respuesta_correcta": 1
+      "respuesta_correcta": 1,
+      "points": 220
     },
     {
       "pais_codigo": "TUN",
@@ -240,7 +252,8 @@
         "Leones",
         "Faraones"
       ],
-      "respuesta_correcta": 0
+      "respuesta_correcta": 0,
+      "points": 190
     },
     {
       "pais_codigo": "URU",
@@ -250,7 +263,8 @@
         "1",
         "2"
       ],
-      "respuesta_correcta": 2
+      "respuesta_correcta": 2,
+      "points": 320
     },
     {
       "pais_codigo": "UZB",
@@ -260,7 +274,8 @@
         "Asia",
         "África"
       ],
-      "respuesta_correcta": 1
+      "respuesta_correcta": 1,
+      "points": 170
     }
   ],
   "usuarios": [
@@ -276,7 +291,7 @@
       "nombre": "Christian Dripp",
       "correo": "christiansalazar2005@gmail.com",
       "password": "5545",
-      "Points": 12500
+      "Points": 4870
     },
     {
       "id": 3,
