@@ -111,13 +111,13 @@ body.no-scroll{
 .modal {
   position: fixed;
   inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: grid; /* Cambiado a grid para mejor control de overflow */
+  place-items: center;
   padding: max(14px, var(--safe-t)) 12px calc(max(14px, var(--safe-b))) 12px;
   background: rgba(0, 0, 0, 0.75);
   backdrop-filter: blur(8px);
   z-index: 100;
+  overflow-y: auto; /* Permite scroll en el fondo si el modal es muy alto */
 }
 
 .modal-card {
@@ -129,8 +129,7 @@ body.no-scroll{
   border: 1px solid rgba(255, 255, 255, 0.15);
   box-shadow: 0 35px 90px rgba(0, 0, 0, 0.45);
   position: relative;
-  max-height: calc(var(--vh, 1vh) * 100 - 40px);
-  overflow: auto;
+  /* max-height y overflow ahora son manejados por el contenedor .modal */
   color: rgba(255, 255, 255, 0.92);
 }
 

@@ -1,9 +1,32 @@
-const cart = [];
+let cart = [];
 let currentProduct = null;
 let currentProducts = [];
 let allStoreProducts = {}; // Para almacenar todos los productos de products.json
 let selectedCoupon = null;
 const generatedCouponCodes = new Set();
+
+/**
+ * Devuelve la clave única para guardar el carrito en localStorage, basada en el ID del usuario.
+ * @returns {string|null} La clave de almacenamiento o null si no hay usuario.
+ */
+function getCartStorageKey() {
+  const userId = localStorage.getItem('worldscan_userId');
+  return userId ? `worldscan_cart_${userId}` : null;
+}
+
+/**
+ * Carga el carrito desde localStorage.
+ */
+function loadCart() {
+  const key = getCartStorageKey();
+  if (!key) {
+    cart = [];
+    return;
+  }
+  const storedCart = localStorage.getItem(key);
+  cart = storedCart ? JSON.parse(storedCart) : [];
+  updateCartUI(); // Actualiza el contador del carrito en el header
+}
 
 function renderProducts(products, type) {
   return products.map((product) => {
@@ -174,6 +197,7 @@ function setupStoreEvents() {
 
     closeModal(document.getElementById('modal-coupon'));
     openModal(cartModal);
+    saveCart();
     renderCart();
   });
 
@@ -202,6 +226,7 @@ function setupStoreEvents() {
 
     closeModal(sizeModal);
     openModal(cartModal);
+    saveCart();
     renderCart();
   });
 
@@ -227,6 +252,21 @@ function setupStoreEvents() {
   });
 }
 
+/**
+ * Guarda el estado actual del carrito en localStorage.
+ */
+function saveCart() {
+  const key = getCartStorageKey();
+  if (key) {
+    localStorage.setItem(key, JSON.stringify(cart));
+  }
+  updateCartUI();
+}
+
+function clearCart() {
+  cart = [];
+  saveCart();
+}
 function openSizeModal(product, index) {
   // Esta función ahora es un alias para jerseys
   currentProduct = {
@@ -380,6 +420,7 @@ function renderCart() {
     button.addEventListener('click', () => {
       const index = Number(button.dataset.index);
       cart.splice(index, 1);
+      saveCart();
       renderCart();
     });
   });
@@ -465,7 +506,9 @@ async function confirmPurchase() {
       if (shippingForm) shippingForm.classList.add('hidden');
       if (cartTotalRow) cartTotalRow.classList.add('hidden');
       if (checkoutStep) checkoutStep.classList.add('hidden');
-      cart.length = 0;
+      
+      // Limpiar el carrito local y de localStorage
+      clearCart();
       selectedCoupon = null;
     } else {
       alert(`Error en la compra: ${purchaseData.message}`);
@@ -493,4 +536,19 @@ function getStoreImage(code) {
   return code ? `./assets/jerseys/${code}.png` : './assets/trionda_ball.png';
 }
 
-loadStoreProducts();
+function updateCartUI() {
+  const cartOpenBtn = document.getElementById('cart-open-btn');
+  if (cartOpenBtn) {
+    const totalItems = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
+    if (totalItems > 0) {
+      cartOpenBtn.innerHTML = `🛒 <span class="cart-count">${totalItems}</span>`;
+    } else {
+      cartOpenBtn.innerHTML = '🛒';
+    }
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  loadCart();
+  loadStoreProducts();
+});
